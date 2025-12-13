@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { Navbar } from "./components/Navbar";
-import { Hero } from "./components/Hero";
+import Hero  from "./components/Hero";
 import  { ReportModal }  from "./components/ReportModal";
 import { AuthModal } from "./components/AuthModal";
 
@@ -13,8 +13,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-black selection:bg-blue-500/30">
       <Navbar onOpenAuth={(mode) => setAuthMode(mode)} />
-      
-      <Hero onOpenModal={() => setIsReportOpen(true)} />
+      <Hero />
       
       <ReportModal 
         isOpen={isReportOpen} 

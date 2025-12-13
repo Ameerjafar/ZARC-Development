@@ -38,7 +38,7 @@ const sampleReportData = {
 };
 
 
-// --- Animation Variants ---
+
 const containerVar = {
   hidden: { opacity: 0 },
   show: {
@@ -52,7 +52,7 @@ const itemVar = {
   show: { opacity: 1, y: 0 }
 };
 
-// --- Sub-Components ---
+
 const StatCard = ({ title, value, change, icon: Icon, color }) => (
   <div className="p-5 rounded-3xl bg-[#131315] border border-white/5 hover:border-white/10 transition-all group relative overflow-hidden">
     <div className={`absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity ${color}`}>
