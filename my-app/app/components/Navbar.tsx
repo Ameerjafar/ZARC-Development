@@ -85,7 +85,7 @@ export const Navbar = ({ onOpenAuth }: NavbarProps) => {
             className="flex items-center gap-2 px-3 cursor-pointer group"
             onClick={() => window.location.href = '/'}
           >
-            <div className="w-9 h-9 bg-gradient-to-r from-indigo-600 to-violet-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform duration-300">
+            <div className="w-9 h-9 bg-gradient-to-r from-orange-600 to-amber-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform duration-300">
               <BarChart2 className="w-5 h-5" />
             </div>
             {!searchOpen && (
