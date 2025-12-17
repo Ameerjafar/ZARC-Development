@@ -8,14 +8,15 @@ import {
 
 // --- VISUAL RIGHT SIDE (Updated Background Colors) ---
 const DashboardPreview = () => (
-  <div className="hidden lg:flex lg:w-[50%] fixed right-0 top-0 h-screen bg-slate-950 items-center justify-center overflow-hidden z-0">
+  <div className="hidden lg:flex lg:w-[50%] fixed right-0 top-0 h-screen bg-[#0F172A] items-center justify-center overflow-hidden z-0">
      {/* Texture & Gradients covering 100% */}
      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 z-10"></div>
      
-     {/* CHANGED: From Indigo (Violent) to Blue-Slate (Neutral/Professional) */}
-     <div className="absolute top-[-10%] right-[-10%] w-[80vw] h-[80vw] max-w-[800px] max-h-[800px] bg-sky-600/20 rounded-full blur-[120px] mix-blend-screen animate-pulse duration-[8000ms]"></div>
-     
-     <div className="absolute bottom-[-10%] left-[-10%] w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] bg-orange-600/20 rounded-full blur-[100px] mix-blend-screen"></div>
+     {/* CHANGED: Soft Teal/Cyan instead of Indigo - complements Orange beautifully */}
+     <div className="absolute top-[-20%] right-[-10%] w-[70vw] h-[70vw] max-w-[900px] max-h-[900px] bg-teal-500/10 rounded-full blur-[120px] mix-blend-screen animate-pulse duration-[10000ms]"></div>
+
+     {/* CHANGED: Warm Amber/Orange accent at bottom */}
+     <div className="absolute bottom-[-20%] left-[-20%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] bg-amber-600/10 rounded-full blur-[100px] mix-blend-screen"></div>
      
      <motion.div 
        initial={{ opacity: 0, y: 20 }}
