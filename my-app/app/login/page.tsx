@@ -3,51 +3,77 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { 
-  Mail, Lock, ArrowRight, Loader2, Chrome, Github, Database 
+  Mail, Lock, ArrowRight, Loader2
 } from "lucide-react";
 
-// --- RIGHT SIDE VISUAL ---
+// --- VISUAL RIGHT SIDE (Updated Background Colors) ---
 const DashboardPreview = () => (
-  <div className="hidden lg:flex w-[55%] bg-slate-900 relative items-center justify-center overflow-hidden h-full">
-     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
-     <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-orange-500/20 rounded-full blur-[120px] -mr-40 -mt-40 mix-blend-screen animate-pulse duration-[5000ms]"></div>
-     <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-[100px] -ml-20 -mb-20 mix-blend-screen"></div>
+  <div className="hidden lg:flex lg:w-[50%] fixed right-0 top-0 h-screen bg-slate-950 items-center justify-center overflow-hidden z-0">
+     {/* Texture & Gradients covering 100% */}
+     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 z-10"></div>
+     
+     {/* CHANGED: From Indigo (Violent) to Blue-Slate (Neutral/Professional) */}
+     <div className="absolute top-[-10%] right-[-10%] w-[80vw] h-[80vw] max-w-[800px] max-h-[800px] bg-sky-600/20 rounded-full blur-[120px] mix-blend-screen animate-pulse duration-[8000ms]"></div>
 
+     <div className="absolute bottom-[-10%] left-[-10%] w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] bg-orange-600/20 rounded-full blur-[100px] mix-blend-screen"></div>
+     
+     {/* Content */}
      <motion.div 
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="relative z-20 bg-slate-800/80 backdrop-blur-2xl border border-slate-700 p-6 rounded-3xl shadow-2xl w-full max-w-lg mx-8"
+       initial={{ opacity: 0, y: 20 }}
+       animate={{ opacity: 1, y: 0 }}
+       transition={{ duration: 0.8, delay: 0.2 }}
+       className="relative z-20 text-center max-w-lg mx-auto px-8"
      >
-        {/* Mock Header */}
-        <div className="flex items-center gap-4 mb-8">
-           <div className="flex gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500" />
-              <div className="w-3 h-3 rounded-full bg-green-500" />
-           </div>
-           <div className="h-2 w-24 bg-slate-700 rounded-full ml-auto" />
-        </div>
-        {/* Mock Chart Area */}
-        <div className="h-56 w-full bg-gradient-to-b from-slate-700/30 to-transparent rounded-xl relative overflow-hidden flex items-end justify-between p-6 gap-3 border border-slate-700/50">
-           {[35, 75, 55, 95, 70, 85].map((h, i) => (
-              <motion.div 
-                key={i}
-                initial={{ height: 0 }}
-                animate={{ height: `${h}%` }}
-                transition={{ duration: 1, delay: 0.5 + (i * 0.1) }}
-                className="w-full bg-orange-500 rounded-t-md opacity-90 shadow-[0_0_15px_rgba(249,115,22,0.5)]" 
-              />
-           ))}
-        </div>
-        
-        <div className="mt-6 flex justify-between items-center text-slate-400 text-xs font-bold uppercase tracking-wider">
-           <span>Weekly Volume</span>
-           <span className="text-white">8.4M Records</span>
-        </div>
+       {/* Mock Chart Visual for Login Page */}
+       <div className="w-full bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-3xl p-6 mb-10 shadow-2xl relative overflow-hidden group hover:border-orange-500/30 transition-colors duration-500">
+          <div className="flex items-center justify-between mb-6">
+             <div className="flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                <div className="w-3 h-3 rounded-full bg-amber-500/80" />
+                <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+             </div>
+             <div className="h-2 w-20 bg-slate-800 rounded-full" />
+          </div>
+          <div className="flex items-end justify-between h-32 gap-3 px-2">
+             {[40, 70, 45, 90, 65, 85].map((h, i) => (
+               <motion.div 
+                 key={i}
+                 initial={{ height: 0 }}
+                 animate={{ height: `${h}%` }}
+                 transition={{ duration: 0.8, delay: 0.4 + (i * 0.1) }}
+                 className="w-full bg-gradient-to-t from-orange-600 to-orange-400 rounded-t-lg opacity-90 group-hover:opacity-100 transition-opacity"
+               />
+             ))}
+          </div>
+       </div>
+
+       <h2 className="text-4xl font-black text-white mb-6 tracking-tight leading-tight">
+         Welcome back, <br/>
+         <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-200">Commander.</span>
+       </h2>
+       <p className="text-slate-400 text-lg font-medium leading-relaxed max-w-sm mx-auto">
+          Your dashboard is ready. Access your reports and manage your scrapers.
+       </p>
      </motion.div>
   </div>
 );
+
+// --- AUTH ICONS ---
+const GoogleIcon = () => (
+    <svg viewBox="0 0 24 24" className="w-6 h-6">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+    </svg>
+);
+
+const GithubIcon = () => (
+    <svg viewBox="0 0 24 24" className="w-6 h-6 fill-[#181717]">
+        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.419-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+    </svg>
+);
+
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -55,95 +81,91 @@ export default function LoginPage() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 1500);
+    setTimeout(() => setIsLoading(false), 2000);
   };
 
   return (
-    <div className="h-screen w-full bg-white flex font-sans text-slate-900 overflow-hidden selection:bg-orange-100 selection:text-orange-900">
+    <div className="min-h-screen w-full flex font-sans text-slate-900 bg-white selection:bg-orange-100 selection:text-orange-900">
       
-      {/* LEFT SIDE: FORM */}
-      <div className="w-full lg:w-[45%] h-full flex flex-col justify-center items-center p-8 lg:p-12 relative z-10">
+      {/* LEFT SIDE: FORM CONTAINER */}
+      <div className="w-full lg:w-[50%] flex flex-col justify-center items-center px-6 py-12 lg:p-12 relative z-10">
         
-        {/* Main Container - Perfectly Centered */}
-        <div className="w-full max-w-sm flex flex-col justify-center">
+        {/* Subtle Background Decor */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+           <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-100/40 rounded-full blur-[80px]"></div>
+           <div className="absolute bottom-[10%] right-[10%] w-[300px] h-[300px] bg-blue-50/50 rounded-full blur-[60px]"></div>
+        </div>
+
+        <div className="w-full max-w-[400px] relative z-10">
            
            {/* Header */}
-           <div className="mb-8">
-              <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Welcome back</h1>
-              <p className="text-slate-500 font-medium text-sm leading-relaxed">
+           <div className="mb-10 text-center lg:text-left">
+              <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-3">Welcome back</h1>
+              <p className="text-slate-500 font-medium text-base leading-relaxed">
                  Enter your credentials to access your workspace.
               </p>
            </div>
 
-           {/* Social Buttons */}
-           <div className="grid grid-cols-2 gap-3 mb-6">
-              <button className="flex items-center justify-center gap-2 py-2.5 px-4 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all font-bold text-xs text-slate-700 shadow-sm active:scale-95">
-                 <Chrome className="w-4 h-4" /> Google
+           {/* Social Icons */}
+           <div className="flex justify-center lg:justify-start gap-5 mb-10">
+              <button className="w-16 h-16 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:scale-105 hover:border-orange-200 hover:shadow-xl hover:shadow-orange-500/10 transition-all duration-300 group">
+                 <GoogleIcon />
               </button>
-              <button className="flex items-center justify-center gap-2 py-2.5 px-4 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all font-bold text-xs text-slate-700 shadow-sm active:scale-95">
-                 <Github className="w-4 h-4" /> Github
+              <button className="w-16 h-16 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:scale-105 hover:border-slate-400 hover:shadow-xl transition-all duration-300 group">
+                 <GithubIcon />
               </button>
            </div>
 
            {/* Divider */}
-           <div className="relative flex items-center mb-6">
-              <div className="flex-grow border-t border-slate-100"></div>
-              <span className="flex-shrink-0 mx-4 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Or continue with</span>
-              <div className="flex-grow border-t border-slate-100"></div>
+           <div className="relative flex items-center mb-8">
+              <div className="flex-grow border-t border-slate-200"></div>
+              <span className="flex-shrink-0 mx-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Or login with email</span>
+              <div className="flex-grow border-t border-slate-200"></div>
            </div>
 
            {/* Form */}
-           <form onSubmit={handleLogin} className="space-y-4">
+           <form onSubmit={handleLogin} className="space-y-5">
+              
               <div className="space-y-1.5">
-                 <label className="text-xs font-bold text-slate-900 ml-1">Email</label>
+                 <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">Email Address</label>
                  <div className="relative group">
-                    <Mail className="absolute left-4 top-3.5 w-4 h-4 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
-                    <input 
-                      type="email" 
-                      placeholder="name@company.com" 
-                      className="w-full bg-slate-50/50 border border-slate-200 focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400"
-                    />
+                    <Mail className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
+                    <input type="email" placeholder="sarah@helix.io" className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-slate-300" />
                  </div>
               </div>
 
               <div className="space-y-1.5">
                  <div className="flex justify-between items-center ml-1">
-                    <label className="text-xs font-bold text-slate-900">Password</label>
-                    <a href="#" className="text-[10px] font-bold text-orange-600 hover:text-orange-700 hover:underline">Forgot?</a>
+                    <label className="text-xs font-bold text-slate-600 uppercase tracking-wide">Password</label>
+                    <a href="#" className="text-xs font-bold text-orange-600 hover:text-orange-700 hover:underline">Forgot Password?</a>
                  </div>
                  <div className="relative group">
-                    <Lock className="absolute left-4 top-3.5 w-4 h-4 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
-                    <input 
-                      type="password" 
-                      placeholder="••••••••" 
-                      className="w-full bg-slate-50/50 border border-slate-200 focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400"
-                    />
+                    <Lock className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
+                    <input type="password" placeholder="••••••••" className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-slate-300" />
                  </div>
               </div>
 
               <button 
                 disabled={isLoading}
-                className="w-full bg-slate-900 hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-slate-900/20 hover:shadow-orange-600/20 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed mt-2 group"
+                className="w-full bg-slate-900 hover:bg-orange-600 text-white font-bold py-4 rounded-xl shadow-xl shadow-slate-900/20 hover:shadow-orange-600/30 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed mt-6 group"
               >
-                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Sign In <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>}
+                 {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Sign In <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></>}
               </button>
            </form>
 
-           {/* Footer Link */}
            <div className="mt-8 text-center">
               <p className="text-sm font-medium text-slate-500">
-                 No account? <a href="/signup" className="text-orange-600 font-bold hover:underline underline-offset-4">Create one</a>
+                 Don't have an account? <a href="/signup" className="text-orange-600 font-bold hover:underline underline-offset-4">Create one</a>
               </p>
            </div>
         </div>
 
-        {/* Absolute Footer Copyright */}
         <div className="absolute bottom-6 text-[10px] font-bold text-slate-300 uppercase tracking-wider">
            © 2025 StratEngine Inc.
         </div>
       </div>
 
-      {/* RIGHT SIDE */}
+      {/* RIGHT SIDE (FIXED & FULL HEIGHT) */}
       <DashboardPreview />
     </div>
   );
