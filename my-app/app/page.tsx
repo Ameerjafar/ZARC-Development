@@ -14,17 +14,16 @@ export default function Home() {
     <main className="min-h-screen bg-black selection:bg-blue-500/30">
       <Navbar onOpenAuth={(mode) => setAuthMode(mode)} />
       <Hero />
-      
       <ReportModal 
         isOpen={isReportOpen} 
         onClose={() => setIsReportOpen(false)} 
       />
       
-      <AuthModal 
+      {/* <AuthModal 
         isOpen={!!authMode} 
         initialMode={authMode || "signin"} 
         onClose={() => setAuthMode(null)} 
-      />
+      // /> */}
     </main>
   );
 }

@@ -3,56 +3,39 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { 
-  Mail, Lock, ArrowRight, Loader2, Chrome, Github, Database 
+  Zap, Mail, Lock, ArrowRight, Loader2, Chrome, Github, User
 } from "lucide-react";
 
 // --- RIGHT SIDE VISUAL ---
 const DashboardPreview = () => (
   <div className="hidden lg:flex w-[55%] bg-slate-900 relative items-center justify-center overflow-hidden h-full">
      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
-     <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-orange-500/20 rounded-full blur-[120px] -mr-40 -mt-40 mix-blend-screen animate-pulse duration-[5000ms]"></div>
-     <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-[100px] -ml-20 -mb-20 mix-blend-screen"></div>
+     <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-500/20 rounded-full blur-[120px] -mr-40 -mt-40 mix-blend-screen animate-pulse duration-[5000ms]"></div>
+     <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-orange-500/20 rounded-full blur-[100px] -ml-20 -mb-20 mix-blend-screen"></div>
 
      <motion.div 
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="relative z-20 bg-slate-800/80 backdrop-blur-2xl border border-slate-700 p-6 rounded-3xl shadow-2xl w-full max-w-lg mx-8"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8 }}
+        className="relative z-20 text-center max-w-md mx-auto"
      >
-        {/* Mock Header */}
-        <div className="flex items-center gap-4 mb-8">
-           <div className="flex gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500" />
-              <div className="w-3 h-3 rounded-full bg-green-500" />
-           </div>
-           <div className="h-2 w-24 bg-slate-700 rounded-full ml-auto" />
+        <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-orange-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-orange-500/40">
+           <Zap className="w-10 h-10 text-white fill-white" />
         </div>
-        {/* Mock Chart Area */}
-        <div className="h-56 w-full bg-gradient-to-b from-slate-700/30 to-transparent rounded-xl relative overflow-hidden flex items-end justify-between p-6 gap-3 border border-slate-700/50">
-           {[35, 75, 55, 95, 70, 85].map((h, i) => (
-              <motion.div 
-                key={i}
-                initial={{ height: 0 }}
-                animate={{ height: `${h}%` }}
-                transition={{ duration: 1, delay: 0.5 + (i * 0.1) }}
-                className="w-full bg-orange-500 rounded-t-md opacity-90 shadow-[0_0_15px_rgba(249,115,22,0.5)]" 
-              />
-           ))}
-        </div>
-        
-        <div className="mt-6 flex justify-between items-center text-slate-400 text-xs font-bold uppercase tracking-wider">
-           <span>Weekly Volume</span>
-           <span className="text-white">8.4M Records</span>
-        </div>
+        <h2 className="text-4xl font-black text-white mb-4 tracking-tight">Scale your scraping.</h2>
+        <p className="text-slate-400 text-lg font-medium leading-relaxed">
+           Join the platform processing 8M+ data points daily.
+           <br />
+           <span className="text-slate-500 text-base">Setup takes less than 2 minutes.</span>
+        </p>
      </motion.div>
   </div>
 );
 
-export default function LoginPage() {
+export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setTimeout(() => setIsLoading(false), 1500);
@@ -64,14 +47,14 @@ export default function LoginPage() {
       {/* LEFT SIDE: FORM */}
       <div className="w-full lg:w-[45%] h-full flex flex-col justify-center items-center p-8 lg:p-12 relative z-10">
         
-        {/* Main Container - Perfectly Centered */}
+        {/* Main Container */}
         <div className="w-full max-w-sm flex flex-col justify-center">
            
            {/* Header */}
            <div className="mb-8">
-              <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Welcome back</h1>
+              <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Create Account</h1>
               <p className="text-slate-500 font-medium text-sm leading-relaxed">
-                 Enter your credentials to access your workspace.
+                 Start extracting intelligence today. Free forever plan included.
               </p>
            </div>
 
@@ -88,12 +71,24 @@ export default function LoginPage() {
            {/* Divider */}
            <div className="relative flex items-center mb-6">
               <div className="flex-grow border-t border-slate-100"></div>
-              <span className="flex-shrink-0 mx-4 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Or continue with</span>
+              <span className="flex-shrink-0 mx-4 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Or register with</span>
               <div className="flex-grow border-t border-slate-100"></div>
            </div>
 
            {/* Form */}
-           <form onSubmit={handleLogin} className="space-y-4">
+           <form onSubmit={handleSignup} className="space-y-4">
+              <div className="space-y-1.5">
+                 <label className="text-xs font-bold text-slate-900 ml-1">Full Name</label>
+                 <div className="relative group">
+                    <User className="absolute left-4 top-3.5 w-4 h-4 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
+                    <input 
+                      type="text" 
+                      placeholder="Alex Designer" 
+                      className="w-full bg-slate-50/50 border border-slate-200 focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400"
+                    />
+                 </div>
+              </div>
+
               <div className="space-y-1.5">
                  <label className="text-xs font-bold text-slate-900 ml-1">Email</label>
                  <div className="relative group">
@@ -107,32 +102,36 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-1.5">
-                 <div className="flex justify-between items-center ml-1">
-                    <label className="text-xs font-bold text-slate-900">Password</label>
-                    <a href="#" className="text-[10px] font-bold text-orange-600 hover:text-orange-700 hover:underline">Forgot?</a>
-                 </div>
+                 <label className="text-xs font-bold text-slate-900 ml-1">Password</label>
                  <div className="relative group">
                     <Lock className="absolute left-4 top-3.5 w-4 h-4 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
                     <input 
                       type="password" 
-                      placeholder="••••••••" 
+                      placeholder="Create a password" 
                       className="w-full bg-slate-50/50 border border-slate-200 focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400"
                     />
                  </div>
               </div>
 
+              <div className="flex items-start gap-2 pt-1 pb-2">
+                 <input type="checkbox" className="mt-1 w-3.5 h-3.5 rounded text-orange-600 focus:ring-orange-500 cursor-pointer border-slate-300" />
+                 <p className="text-xs font-medium text-slate-500 leading-snug">
+                    I agree to the <a href="#" className="text-slate-900 font-bold hover:underline">Terms</a> and <a href="#" className="text-slate-900 font-bold hover:underline">Privacy Policy</a>.
+                 </p>
+              </div>
+
               <button 
                 disabled={isLoading}
-                className="w-full bg-slate-900 hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-slate-900/20 hover:shadow-orange-600/20 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed mt-2 group"
+                className="w-full bg-slate-900 hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-slate-900/20 hover:shadow-orange-600/20 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed group"
               >
-                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Sign In <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>}
+                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Create Account <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>}
               </button>
            </form>
 
            {/* Footer Link */}
            <div className="mt-8 text-center">
               <p className="text-sm font-medium text-slate-500">
-                 No account? <a href="/signup" className="text-orange-600 font-bold hover:underline underline-offset-4">Create one</a>
+                 Have an account? <a href="/login" className="text-orange-600 font-bold hover:underline underline-offset-4">Log in</a>
               </p>
            </div>
         </div>

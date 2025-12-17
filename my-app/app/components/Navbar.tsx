@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from 'next/navigation'
 import {
   motion,
   AnimatePresence,
@@ -32,7 +33,7 @@ const navLinks = [
     ]
   },
   { label: "Solutions", href: "#" },
-  { label: "Pricing", href: "#" },
+  { label: "admin", href: "/admin" },
 ];
 
 export const Navbar = ({ onOpenAuth }: NavbarProps) => {
@@ -41,7 +42,7 @@ export const Navbar = ({ onOpenAuth }: NavbarProps) => {
   const [activeHover, setActiveHover] = useState<number | null>(null);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const router = useRouter();
   const { scrollY } = useScroll();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -133,8 +134,6 @@ export const Navbar = ({ onOpenAuth }: NavbarProps) => {
                       <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${activeDropdown === index ? "rotate-180" : "opacity-50"}`} />
                     )}
                   </a>
-                  
-                  {/* Animated Pill Background */}
                   {activeHover === index && (
                     <motion.div
                       layoutId="nav-pill"
@@ -142,8 +141,6 @@ export const Navbar = ({ onOpenAuth }: NavbarProps) => {
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
-
-                  {/* Dropdown Menu */}
                   <AnimatePresence>
                     {link.subItems && activeDropdown === index && (
                       <motion.div
@@ -177,7 +174,7 @@ export const Navbar = ({ onOpenAuth }: NavbarProps) => {
           {/* Action Buttons */}
           <motion.div layout className="flex items-center gap-2 pl-1 pr-1">
             <button
-              onClick={() => onOpenAuth("signin")}
+              onClick={() => router.push('/login')}
               className="hidden sm:block px-5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
             >
               Log in
@@ -250,6 +247,7 @@ export const Navbar = ({ onOpenAuth }: NavbarProps) => {
             >
               <button
                 className="w-full py-4 rounded-2xl bg-slate-50 text-slate-900 font-bold text-lg hover:bg-slate-100 transition-colors"
+                onClick  = { () => router.push('/login')}
               >
                 Log In
               </button>
