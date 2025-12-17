@@ -19,11 +19,6 @@ export default function Home() {
         onClose={() => setIsReportOpen(false)} 
       />
       
-      {/* <AuthModal 
-        isOpen={!!authMode} 
-        initialMode={authMode || "signin"} 
-        onClose={() => setAuthMode(null)} 
-      // /> */}
     </main>
   );
 }

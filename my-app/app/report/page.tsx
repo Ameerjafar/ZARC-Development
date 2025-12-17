@@ -1,256 +1,466 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { saveAs } from "file-saver";
 import {
-  ArrowLeft, Download, Share2, TrendingUp, Activity,
-  Zap, Shield, AlertTriangle, Battery, Sun, Globe
+  Document,
+  Packer,
+  Paragraph,
+  HeadingLevel,
+  TextRun,
+  AlignmentType,
+} from "docx";
+import {
+  X,
+  Search,
+  Zap,
+  Check,
+  ChevronRight,
+  FileText,
+  Sparkles,
+  ArrowRight,
+  Tag
 } from "lucide-react";
 import Link from "next/link";
 
-// --- Data Structure Example ---
-// This object represents the data your form would generate.
-// Pass this structure as a prop to the ReportPage component.
-const sampleReportData = {
-  marketName: "Solar Energy",
-  reportQuarter: "Q4 2025",
-  reportScope: "Global Scope",
-  executiveSummary: {
-    main: "The solar energy landscape is currently undergoing a rapid consolidation phase (Q4 2025). Our analysis indicates that while residential adoption has slowed by 4% due to interest rate volatility, commercial installations have surged by 18%, driven by new corporate ESG mandates.",
-    pivot: "Key competitors like SunRun and Tesla Energy are aggressively pivoting towards integrated battery storage solutions to combat grid instability. Standalone panel sales are declining in favor of 'Energy-as-a-Service' subscription models.",
-    insight: "New entrants focusing on high-efficiency perovskite panels in the European market are threatening legacy silicon-based manufacturers."
-  },
-  stats: [
-    { title: "Market Cap", value: "$142.5B", change: "+12.5%", icon: Globe, color: "text-blue-500" },
-    { title: "Installation Growth", value: "18.2%", change: "+5.4%", icon: Activity, color: "text-green-500" },
-    { title: "Storage Adoption", value: "42%", change: "+24%", icon: Battery, color: "text-purple-500" },
-    { title: "Avg Cost / Watt", value: "$2.15", change: "-8.1%", icon: Sun, color: "text-orange-500" }
+// --- Types ---
+interface Option {
+  id: string;
+  label: string;
+  category?: string;
+}
+
+// --- Mock Large Datasets ---
+const ALL_INDUSTRIES: Option[] = [
+  { id: "solar", label: "Solar Energy" },
+  { id: "fintech", label: "Fintech Payments" },
+  { id: "saas_b2b", label: "B2B SaaS" },
+  { id: "ecommerce_fashion", label: "E-commerce (Fashion)" },
+  { id: "biotech", label: "Biotechnology" },
+  { id: "real_estate", label: "Commercial Real Estate" },
+  { id: "ev", label: "Electric Vehicles" },
+  { id: "cybersec", label: "Cybersecurity" },
+  { id: "agritech", label: "Agritech" },
+  { id: "gaming", label: "Gaming & Esports" },
+  { id: "healthtech", label: "HealthTech & Telemedicine" },
+  { id: "logistics", label: "Logistics & Supply Chain" },
+  { id: "edtech", label: "Educational Technology" },
+  { id: "proptech", label: "PropTech" },
+  { id: "insurtech", label: "InsurTech" },
+  { id: "clean_energy", label: "Clean Energy & Renewables" },
+  { id: "ai_ml", label: "Artificial Intelligence (AI/ML)" },
+  { id: "blockchain", label: "Blockchain & Web3" },
+  { id: "robotics", label: "Robotics & Automation" },
+  { id: "iot", label: "Internet of Things (IoT)" },
+];
+
+const ALL_MODULES: Option[] = [
+  { id: "tam_sam_som", label: "Market Size (TAM/SAM/SOM)", category: "Market" },
+  { id: "swot", label: "SWOT Analysis", category: "Strategy" },
+  { id: "pestle", label: "PESTLE Framework", category: "Strategy" },
+  { id: "competitor_pricing", label: "Competitor Pricing Matrix", category: "Competitor" },
+  { id: "customer_persona", label: "Customer Personas", category: "Consumer" },
+  { id: "regulations", label: "Regulatory Landscape", category: "Legal" },
+  { id: "supply_chain", label: "Supply Chain Risks", category: "Operations" },
+  { id: "seo_gap", label: "SEO Keyword Gap", category: "Digital" },
+  { id: "social_sentiment", label: "Social Sentiment Analysis", category: "Digital" },
+  { id: "ma_activity", label: "M&A Recent Activity", category: "Finance" },
+  { id: "vc_funding", label: "VC Funding Trends", category: "Finance" },
+  { id: "tech_stack", label: "Technology Stack Analysis", category: "Tech" },
+  { id: "talent_pool", label: "Talent & Hiring Trends", category: "HR" },
+  { id: "esg_score", label: "ESG Scoring & Compliance", category: "Sustainability" },
+  { id: "patent_analysis", label: "Patent Landscape", category: "R&D" },
+];
+
+const SECTION_CONTENT: Record<string, string[]> = {
+  default: [
+    "Market consolidation is accelerating, with larger players acquiring innovative startups.",
+    "Customer acquisition costs (CAC) have increased by approximately 12% in the last fiscal year.",
+    "Digital-first adoption is accelerating across all customer segments.",
+    "Most competitors currently under-invest in emerging technologies, creating a gap for disruption.",
   ],
-  aiInsight: {
-    title: "Critical Gap Detected",
-    description: "64% of identified competitors are under-investing in VPP (Virtual Power Plant) software compatibility."
-  },
-  competitors: [
-    { name: "Tesla Energy", share: "24", strategy: "Ecosystem Lock-in", risk: "High" },
-    { name: "SunRun", share: "18", strategy: "Leasing Model", risk: "Medium" },
-    { name: "Enphase", share: "12", strategy: "Microinverters", risk: "Low" }
-  ]
 };
 
+// --- Main Page Component ---
+export default function ReportPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-
-const containerVar = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 }
-  }
-};
-
-const itemVar = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 }
-};
-
-
-const StatCard = ({ title, value, change, icon: Icon, color }) => (
-  <div className="p-5 rounded-3xl bg-[#131315] border border-white/5 hover:border-white/10 transition-all group relative overflow-hidden">
-    <div className={`absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity ${color}`}>
-      <Icon className="w-12 h-12" />
-    </div>
-    <div className="flex flex-col h-full justify-between relative z-10">
-      <div className="flex items-center gap-2 mb-2">
-        <span className={`p-1.5 rounded-lg bg-white/5 ${color} text-white`}>
-          <Icon className="w-4 h-4" />
-        </span>
-        <span className="text-gray-400 text-sm font-medium">{title}</span>
-      </div>
-      <div>
-        <div className="text-2xl font-bold text-white mb-1">{value}</div>
-        <div className="text-xs text-green-400 flex items-center gap-1">
-          <TrendingUp className="w-3 h-3" />
-          {change} <span className="text-gray-600">vs last Q</span>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-const CompetitorRow = ({ name, share, strategy, risk }) => (
-  <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
-    <div className="flex items-center gap-3">
-      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-700 to-black border border-white/10 flex items-center justify-center text-xs font-bold">
-        {name.substring(0, 2)}
-      </div>
-      <div>
-        <h4 className="text-sm font-medium text-white">{name}</h4>
-        <p className="text-xs text-gray-400">{strategy}</p>
-      </div>
-    </div>
-    <div className="text-right">
-      <div className="text-sm font-bold text-white">{share}%</div>
-      <div className={`text-xs ${risk === 'High' ? 'text-red-400' : risk === 'Medium' ? 'text-yellow-400' : 'text-green-400'}`}>
-        {risk} Threat
-      </div>
-    </div>
-  </div>
-);
-
-// --- Main Page ---
-const ReportPageContent = ({ reportData }) => {
   return (
-    <main className="min-h-screen bg-[#050505] text-white p-4 md:p-8 pt-24 selection:bg-orange-500/30">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-100 text-gray-900 selection:bg-orange-200">
       
-      {/* Ambient Background for Solar Theme */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-orange-600/10 rounded-full blur-[150px]" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-900/10 rounded-full blur-[150px]" />
+      {/* Background Decor */}
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-orange-200/30 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-orange-300/20 rounded-full blur-[100px]" />
       </div>
 
-      <div className="max-w-[1400px] mx-auto relative z-10">
+      {/* Main Content */}
+      <main className="relative z-10 max-w-6xl mx-auto px-6 h-screen flex flex-col justify-center items-center text-center">
         
-        {/* Header */}
-        <motion.header
-          initial={{ opacity: 0, y: -20 }}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12"
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="space-y-8"
+        >
+          <motion.div 
+            whileHover={{ scale: 1.05 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-orange-200 shadow-sm text-orange-600 text-sm font-semibold"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Enterprise Intelligence Engine</span>
+          </motion.div>
+
+          <h1 className="text-6xl md:text-7xl font-bold tracking-tight text-gray-900 leading-[1.1]">
+            Unlock <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-500">Global Market</span> <br />
+            Insights Instantly.
+          </h1>
+
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Access over 5,000+ industry data points. Build custom reports with our modular AI engine. Export to DOCX in seconds.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsModalOpen(true)}
+              className="px-8 py-4 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-bold rounded-2xl shadow-xl shadow-orange-500/20 transition-all flex items-center gap-2 text-lg"
+            >
+              <FileText className="w-5 h-5" />
+              Generate Report
+            </motion.button>
+            
+            <Link 
+              href="/reports-history"
+              className="px-8 py-4 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 font-semibold rounded-2xl transition-all shadow-sm flex items-center gap-2 text-lg"
+            >
+              View Library
+            </Link>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 1 }}
+          className="absolute bottom-12 grid grid-cols-1 md:grid-cols-3 gap-12 text-center"
         >
           <div>
-            <Link href="/" className="inline-flex items-center text-sm text-gray-500 hover:text-white mb-4 transition-colors">
-              <ArrowLeft className="w-4 h-4 mr-2" /> Return to Generator
-            </Link>
-            <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight">
-              {reportData.marketName} <span className="text-gray-600">Market Intel</span>
-            </h1>
-            <div className="flex items-center gap-3 mt-3 text-sm text-gray-400">
-              <span className="px-2 py-0.5 rounded border border-white/10 bg-white/5 text-white">{reportData.reportQuarter}</span>
-              <span>•</span>
-              <span>{reportData.reportScope}</span>
-              <span>•</span>
-              <span className="text-green-400 flex items-center gap-1"><Activity className="w-3 h-3" /> Live Data</span>
-            </div>
+            <div className="text-3xl font-bold text-gray-900">10k+</div>
+            <div className="text-sm text-gray-500 font-medium">Industries Tracked</div>
           </div>
-          
-          <div className="flex gap-3">
-            <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-sm font-medium">
-              <Share2 className="w-4 h-4" /> Share
-            </button>
-            <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-orange-500 hover:bg-orange-400 transition-colors text-black text-sm font-bold shadow-lg shadow-orange-900/20">
-              <Download className="w-4 h-4" /> Export PDF
-            </button>
+          <div>
+            <div className="text-3xl font-bold text-gray-900">500+</div>
+            <div className="text-sm text-gray-500 font-medium">Data Modules</div>
           </div>
-        </motion.header>
-
-        {/* Bento Grid Layout */}
-        <motion.div
-          variants={containerVar}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-[minmax(180px,auto)]"
-        >
-
-          {/* 1. Executive Summary (Wide) */}
-          <motion.div variants={itemVar} className="md:col-span-2 lg:col-span-2 row-span-2 p-8 rounded-3xl bg-[#131315] border border-white/5 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-6 opacity-5">
-              <FileIcon className="w-32 h-32" />
-            </div>
-            <div className="relative z-10">
-              <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                <Zap className="w-5 h-5 text-orange-400" /> Executive Summary
-              </h2>
-              <div className="space-y-4 text-gray-300 leading-relaxed">
-                <p>
-                  <strong className="text-white">Consolidation Phase:</strong> {reportData.executiveSummary.main}
-                </p>
-                <p>
-                  <strong className="text-white">Pivot to Storage:</strong> {reportData.executiveSummary.pivot}
-                </p>
-                <div className="p-4 mt-6 rounded-2xl bg-blue-500/10 border border-blue-500/20">
-                  <h4 className="text-blue-300 text-sm font-bold mb-1 flex items-center gap-2">
-                    <Globe className="w-4 h-4" /> Global Insight
-                  </h4>
-                  <p className="text-xs text-blue-100/70">
-                    {reportData.executiveSummary.insight}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* 2. Key Stats (Top Right) */}
-          <motion.div variants={itemVar} className="md:col-span-1 lg:col-span-2 grid grid-cols-2 gap-4">
-            {reportData.stats.map((stat, index) => (
-              <StatCard
-                key={index}
-                title={stat.title}
-                value={stat.value}
-                change={stat.change}
-                icon={stat.icon}
-                color={stat.color}
-              />
-            ))}
-          </motion.div>
-
-          {/* 3. AI Insight (Middle Row) */}
-          <motion.div variants={itemVar} className="md:col-span-1 lg:col-span-1 p-6 rounded-3xl bg-gradient-to-b from-orange-500/20 to-[#131315] border border-orange-500/20 flex flex-col justify-center">
-            <div className="w-10 h-10 rounded-full bg-orange-500 text-black flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(249,115,22,0.4)]">
-              <AlertTriangle className="w-5 h-5" />
-            </div>
-            <h3 className="text-lg font-bold text-white mb-2">{reportData.aiInsight.title}</h3>
-            <p className="text-sm text-gray-300 mb-4">
-              {reportData.aiInsight.description}
-            </p>
-            <button className="w-full py-2 text-xs font-bold text-black bg-white rounded-lg hover:bg-gray-200 transition-colors">
-              View Opportunity
-            </button>
-          </motion.div>
-
-          {/* 4. Competitor Table (Bottom Row) */}
-          <motion.div variants={itemVar} className="md:col-span-3 lg:col-span-3 p-8 rounded-3xl bg-[#131315] border border-white/5">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold flex items-center gap-2">
-                <Shield className="w-5 h-5 text-gray-400" /> Competitor Matrix
-              </h2>
-              <button className="text-xs text-gray-400 hover:text-white transition-colors">View All</button>
-            </div>
-            <div className="space-y-3">
-              {reportData.competitors.map((competitor, index) => (
-                <CompetitorRow
-                  key={index}
-                  name={competitor.name}
-                  share={competitor.share}
-                  strategy={competitor.strategy}
-                  risk={competitor.risk}
-                />
-              ))}
-            </div>
-          </motion.div>
-
+          <div>
+            <div className="text-3xl font-bold text-gray-900">0.2s</div>
+            <div className="text-sm text-gray-500 font-medium">Generation Speed</div>
+          </div>
         </motion.div>
-      </div>
-    </main>
+      </main>
+
+      <ReportModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+    </div>
   );
 }
 
-// Default export renders the page with sample data
-export default function ReportPage() {
-    return <ReportPageContent reportData={sampleReportData} />;
-}
+// --- Enhanced Modal Component ---
+const ReportModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  const [step, setStep] = useState<"industry" | "modules" | "generating" | "complete">("industry");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedIndustry, setSelectedIndustry] = useState<Option | null>(null);
+  const [selectedModules, setSelectedModules] = useState<Option[]>([]);
+  
+  // Filtering Logic
+  const filteredIndustries = useMemo(() => 
+    ALL_INDUSTRIES.filter(ind => ind.label.toLowerCase().includes(searchQuery.toLowerCase())), 
+  [searchQuery]);
 
-const FileIcon = (props: any) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-    <polyline points="14 2 14 8 20 8" />
-  </svg>
-)
+  const filteredModules = useMemo(() => 
+    ALL_MODULES.filter(mod => mod.label.toLowerCase().includes(searchQuery.toLowerCase())), 
+  [searchQuery]);
+
+  const toggleModule = (mod: Option) => {
+    setSelectedModules(prev => {
+      const exists = prev.find(m => m.id === mod.id);
+      if (exists) return prev.filter(m => m.id !== mod.id);
+      return [...prev, mod];
+    });
+  };
+
+  const removeModule = (id: string) => {
+    setSelectedModules(prev => prev.filter(m => m.id !== id));
+  };
+
+  const generateDOCX = async () => {
+    setStep("generating");
+    await new Promise(r => setTimeout(r, 2000)); 
+
+    const docChildren: Paragraph[] = [];
+
+    // Title Page
+    docChildren.push(
+      new Paragraph({
+        text: "MARKET INTELLIGENCE REPORT",
+        heading: HeadingLevel.HEADING_1,
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 200 },
+        run: { size: 32, bold: true, color: "ED7D31" }, 
+      }),
+      new Paragraph({
+        text: (selectedIndustry?.label || "Market").toUpperCase(),
+        heading: HeadingLevel.HEADING_2,
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 400 },
+        run: { size: 28, bold: true },
+      }),
+      new Paragraph({
+        text: `Generated on ${new Date().toLocaleDateString()}`,
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 800 },
+        run: { size: 20, color: "666666" },
+      })
+    );
+
+    // Modules Content
+    selectedModules.forEach(mod => {
+      docChildren.push(
+        new Paragraph({
+          text: mod.label.toUpperCase(),
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 400, after: 200 },
+          run: { color: "ED7D31" },
+        })
+      );
+      SECTION_CONTENT.default.forEach(text => {
+        docChildren.push(new Paragraph({ children: [new TextRun(text)], spacing: { after: 120 } }));
+      });
+    });
+
+    const doc = new Document({ sections: [{ children: docChildren }] });
+    const blob = await Packer.toBlob(doc);
+    saveAs(blob, `${selectedIndustry?.label.replace(/\s+/g, "_")}_Report.docx`);
+    setStep("complete");
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 z-50 bg-white/60 backdrop-blur-md"
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center p-4 pointer-events-none"
+          >
+            <div className="pointer-events-auto w-full max-w-3xl bg-white border border-gray-100 rounded-3xl shadow-2xl shadow-orange-500/10 flex flex-col overflow-hidden h-[85vh]">
+              
+              {/* Header */}
+              <div className="flex-none px-8 py-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">
+                    {step === "industry" ? "Select Industry" : 
+                     step === "modules" ? "Customize Report" : 
+                     step === "generating" ? "Processing" : "Ready"}
+                  </h2>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {step === "industry" && "Search across 1,000+ market sectors"}
+                    {step === "modules" && `Targeting: ${selectedIndustry?.label}`}
+                  </p>
+                </div>
+                <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full text-gray-400 transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Body Content - Scrollable Area */}
+              <div className="flex-1 overflow-hidden flex flex-col relative bg-white">
+                
+                {/* STEP 1: INDUSTRY */}
+                {step === "industry" && (
+                  <div className="flex flex-col h-full">
+                    <div className="flex-none p-6 border-b border-gray-50">
+                      <div className="relative">
+                        <Search className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                        <input 
+                          autoFocus
+                          type="text" 
+                          placeholder="Type to find industry..." 
+                          className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl text-lg focus:ring-2 focus:ring-orange-500/20 outline-none"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-2 custom-scrollbar">
+                      {filteredIndustries.map(ind => (
+                        <button
+                          key={ind.id}
+                          onClick={() => {
+                            setSelectedIndustry(ind);
+                            setSearchQuery("");
+                            setStep("modules");
+                          }}
+                          className="w-full text-left px-6 py-4 hover:bg-orange-50 rounded-lg group flex items-center justify-between transition-colors border-b border-gray-50 last:border-0"
+                        >
+                          <span className="text-gray-700 font-medium text-lg">{ind.label}</span>
+                          <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-orange-500" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* STEP 2: MODULES */}
+                {step === "modules" && (
+                  <div className="flex flex-col h-full">
+                    
+                    {/* Fixed Top Section: Tags + Search */}
+                    <div className="flex-none border-b border-gray-100 bg-white z-10">
+                      {/* Active Tags */}
+                      {selectedModules.length > 0 && (
+                        <div className="px-6 py-4 bg-orange-50/50 border-b border-orange-100 flex flex-wrap gap-2 max-h-32 overflow-y-auto custom-scrollbar">
+                           {selectedModules.map(mod => (
+                             <motion.span 
+                               key={mod.id}
+                               initial={{ scale: 0.8, opacity: 0 }}
+                               animate={{ scale: 1, opacity: 1 }}
+                               className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-orange-200 rounded-full text-sm font-medium text-orange-700 shadow-sm"
+                             >
+                               {mod.label}
+                               <button 
+                                 onClick={(e) => { e.stopPropagation(); removeModule(mod.id); }}
+                                 className="hover:bg-orange-100 rounded-full p-0.5 transition-colors"
+                               >
+                                 <X className="w-3 h-3" />
+                               </button>
+                             </motion.span>
+                           ))}
+                        </div>
+                      )}
+
+                      {/* Search Bar */}
+                      <div className="p-6">
+                        <div className="relative">
+                          <Search className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                          <input 
+                            autoFocus
+                            type="text" 
+                            placeholder="Search 1,000+ data modules..." 
+                            className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-orange-500/20 outline-none"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Scrollable Module List */}
+                    <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                      <div className="grid grid-cols-1 gap-2 pb-4">
+                        {filteredModules.map(mod => {
+                          const isSelected = selectedModules.some(m => m.id === mod.id);
+                          return (
+                            <button
+                              key={mod.id}
+                              onClick={() => toggleModule(mod)}
+                              className={`w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between group ${
+                                isSelected 
+                                  ? "bg-orange-50 border-orange-500 shadow-sm" 
+                                  : "bg-white border-gray-100 hover:border-orange-200 hover:shadow-sm"
+                              }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className={`p-2 rounded-lg ${isSelected ? "bg-orange-200 text-orange-700" : "bg-gray-100 text-gray-500"}`}>
+                                  <Tag className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <div className={`font-semibold ${isSelected ? "text-orange-900" : "text-gray-700"}`}>{mod.label}</div>
+                                  <div className="text-xs text-gray-400">{mod.category}</div>
+                                </div>
+                              </div>
+                              {isSelected && <Check className="w-5 h-5 text-orange-500" />}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Fixed Footer Buttons */}
+                    <div className="flex-none p-6 border-t border-gray-100 bg-white flex justify-between items-center z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                      <button 
+                        onClick={() => setStep("industry")} 
+                        className="text-gray-400 hover:text-gray-600 font-medium px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        Back
+                      </button>
+                      <button 
+                        onClick={generateDOCX}
+                        disabled={selectedModules.length === 0}
+                        className="px-8 py-3 bg-orange-600 hover:bg-orange-500 text-white rounded-xl font-bold shadow-lg shadow-orange-500/20 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed transition-all flex items-center gap-2"
+                      >
+                         Generate Report <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* STEPS 3 & 4 (Processing/Complete) */}
+                {(step === "generating" || step === "complete") && (
+                  <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-gray-50/30">
+                     {step === "generating" ? (
+                       <div className="relative mb-8">
+                         <div className="w-24 h-24 rounded-full border-[6px] border-orange-100 border-t-orange-500 animate-spin" />
+                         <Zap className="w-8 h-8 text-orange-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                       </div>
+                     ) : (
+                       <motion.div 
+                         initial={{ scale: 0.5, opacity: 0 }}
+                         animate={{ scale: 1, opacity: 1 }}
+                         className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-8 border-4 border-white shadow-xl"
+                       >
+                         <Check className="w-12 h-12 text-green-600" />
+                       </motion.div>
+                     )}
+                     
+                     <h3 className="text-3xl font-bold text-gray-900 mb-2">
+                       {step === "generating" ? "Synthesizing Data..." : "Report Ready!"}
+                     </h3>
+                     <p className="text-gray-500 max-w-sm mx-auto text-lg">
+                       {step === "generating" 
+                         ? `Processing ${selectedModules.length} selected modules for the ${selectedIndustry?.label} sector.` 
+                         : "Your custom intelligence report has been downloaded successfully."}
+                     </p>
+
+                     {step === "complete" && (
+                       <button 
+                         onClick={() => {
+                           setStep("industry");
+                           setSearchQuery("");
+                           setSelectedModules([]);
+                         }}
+                         className="mt-10 px-8 py-4 bg-white border border-gray-200 text-gray-900 rounded-xl font-bold hover:bg-gray-50 transition-colors shadow-sm"
+                       >
+                         Create Another Report
+                       </button>
+                     )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
