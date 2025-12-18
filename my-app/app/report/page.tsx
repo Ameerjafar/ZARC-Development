@@ -163,10 +163,7 @@ export default function ReportPage() {
     </div>
   );
 }
-
-// --- Vertical Stepper Modal Component ---
 const ReportModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-  // Steps: 0: Industry, 1: Modules, 2: Generating, 3: Complete
   const [currentStep, setCurrentStep] = useState(0); 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIndustry, setSelectedIndustry] = useState<Option | null>(null);
@@ -405,8 +402,6 @@ const ReportModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
                         </div>
                       </div>
                     )}
-
-                    {/* STEP 2: MODULES */}
                     {currentStep === 1 && (
                       <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-300">
                          <div className="flex-none px-10 py-8 border-b border-slate-50 bg-white z-10">
@@ -508,7 +503,7 @@ const ReportModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
                             <motion.div 
                               initial={{ scale: 0.5, opacity: 0 }}
                               animate={{ scale: 1, opacity: 1 }}
-                              type="spring"
+                              transition={{ type: "spring" }}
                               className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mb-8 border-[6px] border-emerald-50 shadow-xl"
                             >
                               <Check className="w-10 h-10 text-emerald-600" />

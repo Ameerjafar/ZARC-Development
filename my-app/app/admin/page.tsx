@@ -198,7 +198,7 @@ export default function AdminConsole() {
   // Function to handle Industry click
   const handleIndustryClick = () => {
     setActiveTab("Industry");
-    window.location.href = "/admin/addindustry";
+    window.location.href = "/admin/industry";
   };
 
   return (
