@@ -108,8 +108,6 @@ export default function TaxonomyPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 font-sans text-slate-900 p-8">
-      
-      {/* Header */}
       <div className="max-w-6xl mx-auto mb-12 flex items-center justify-between">
          <div className="flex items-center gap-4">
             <button className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 text-slate-400 hover:text-orange-500 transition-colors">
