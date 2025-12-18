@@ -27,7 +27,8 @@ import {
   ShieldCheck,
   Users,
   Bell,
-  Tag
+  Tag,
+  Building2 // Added for the Industry icon
 } from "lucide-react";
 
 // --- DATA ---
@@ -194,6 +195,12 @@ export default function AdminConsole() {
   const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Function to handle Industry click
+  const handleIndustryClick = () => {
+    setActiveTab("Industry");
+    window.location.href = "/admin/addindustry";
+  };
+
   return (
     <div className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 text-slate-900 flex overflow-hidden selection:bg-orange-100 selection:text-orange-900">
       {/* SIDEBAR */}
@@ -213,7 +220,17 @@ export default function AdminConsole() {
           <SidebarItem icon={Database} label="Usage & Billing" active={activeTab === "Usage"} collapsed={isSidebarCollapsed} onClick={() => setActiveTab("Usage")} badge="Live" />
           <SidebarItem icon={Server} label="Infrastructure" active={activeTab === "Infra"} collapsed={isSidebarCollapsed} onClick={() => setActiveTab("Infra")} />
           <div className="my-6 border-t border-slate-100" />
-          <SidebarItem icon={Tag} label="Taxonomy" active={activeTab === "Taxonomy"} collapsed={isSidebarCollapsed} onClick={() => setActiveTab("Taxonomy")} badge="Manage" />
+          
+          {/* UPDATED SECTION: Removed Taxonomy, Added Industry */}
+          <SidebarItem 
+            icon={Building2} 
+            label="Industry" 
+            active={activeTab === "Industry"} 
+            collapsed={isSidebarCollapsed} 
+            onClick={handleIndustryClick} 
+            badge="Manage" 
+          />
+          
           <SidebarItem icon={Code} label="API & Keys" collapsed={isSidebarCollapsed} />
           <SidebarItem icon={Settings} label="Settings" collapsed={isSidebarCollapsed} />
           {!isSidebarCollapsed && (
@@ -380,5 +397,3 @@ export default function AdminConsole() {
     </div>
   );
 }
-
-
