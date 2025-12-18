@@ -14,9 +14,11 @@ import {
   Plus,
   ArrowUpDown,
   ArrowLeft,
-  Check // Added Check icon
+  Check
 } from "lucide-react";
 import Link from "next/link";
+// Ensure this path matches where you saved the component from step 1
+import CreateReportModal from '../components/ReportModal'; 
 
 // --- Types ---
 interface Report {
@@ -81,6 +83,9 @@ export default function ReportsHistoryPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [reportToDelete, setReportToDelete] = useState<string | null>(null);
 
+  // --- NEW STATE: Modal Visibility ---
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
   // Custom Dropdown State
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -141,7 +146,7 @@ export default function ReportsHistoryPage() {
           className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4"
         >
           <div className="flex items-start gap-4">
-             <Link href="/report" className="mt-1 p-2 bg-white hover:bg-orange-50 rounded-full shadow-sm border border-gray-100 transition-colors group">
+             <Link href="/" className="mt-1 p-2 bg-white hover:bg-orange-50 rounded-full shadow-sm border border-gray-100 transition-colors group">
                 <ArrowLeft className="w-5 h-5 text-gray-400 group-hover:text-orange-600" />
              </Link>
              <div>
@@ -152,13 +157,14 @@ export default function ReportsHistoryPage() {
              </div>
           </div>
           
-          <Link
-            href="/report"
+          {/* UPDATED: Button opens modal instead of navigating */}
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
             className="px-6 py-3 bg-orange-600 hover:bg-orange-500 rounded-xl text-sm font-bold text-white shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Create New Report
-          </Link>
+          </button>
         </motion.div>
 
         {/* Filters Bar */}
@@ -200,7 +206,7 @@ export default function ReportsHistoryPage() {
                 {selectedIndustry === "all" ? "All Industries" : selectedIndustry}
                 <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-transform ${isDropdownOpen ? "rotate-180 text-orange-500" : "text-gray-400"}`} />
               </button>
-
+              
               {/* Dropdown Menu */}
               <AnimatePresence>
                 {isDropdownOpen && (
@@ -281,13 +287,15 @@ export default function ReportsHistoryPage() {
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">No reports found</h3>
               <p className="text-gray-500 mb-8">Try adjusting your filters or search query.</p>
-              <Link
-                href="/report"
+              
+              {/* UPDATED: Button opens modal instead of navigating */}
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 hover:bg-orange-500 rounded-xl font-bold text-white shadow-lg shadow-orange-500/20 transition-all"
               >
                 <Plus className="w-4 h-4" />
                 Create New Report
-              </Link>
+              </button>
             </motion.div>
           ) : (
             <motion.div
@@ -340,20 +348,20 @@ export default function ReportsHistoryPage() {
                       </div>
                       
                       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                         <button 
-                           onClick={() => handleDownload(report)}
-                           className="p-1.5 hover:bg-orange-50 text-gray-400 hover:text-orange-600 rounded-lg transition-colors"
-                           title="Download"
-                         >
-                           <Download className="w-4 h-4" />
-                         </button>
-                         <button 
-                           onClick={() => handleDelete(report.id)}
-                           className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors"
-                           title="Delete"
-                         >
-                           <Trash2 className="w-4 h-4" />
-                         </button>
+                          <button 
+                            onClick={() => handleDownload(report)}
+                            className="p-1.5 hover:bg-orange-50 text-gray-400 hover:text-orange-600 rounded-lg transition-colors"
+                            title="Download"
+                          >
+                            <Download className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(report.id)}
+                            className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                       </div>
                     </div>
                   </div>
@@ -364,6 +372,12 @@ export default function ReportsHistoryPage() {
         </AnimatePresence>
 
       </main>
+
+      {/* --- RENDER THE CREATE MODAL --- */}
+      <CreateReportModal 
+        isOpen={isCreateModalOpen} 
+        onClose={() => setIsCreateModalOpen(false)} 
+      />
 
       {/* Delete Confirmation Modal */}
       <AnimatePresence>

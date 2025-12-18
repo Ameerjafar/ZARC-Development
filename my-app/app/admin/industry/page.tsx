@@ -346,8 +346,6 @@ export default function AddIndustryPage() {
                     </div>
                   </div>
                </div>
-
-               {/* DROP TARGET */}
                <div 
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
