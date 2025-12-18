@@ -6,16 +6,11 @@ import {
   Zap, Mail, Lock, ArrowRight, Loader2, User, Building2, Briefcase
 } from "lucide-react";
 
-// --- VISUAL RIGHT SIDE (Unchanged from your provided code) ---
 const DashboardPreview = () => (
   <div className="hidden lg:flex lg:w-[50%] fixed right-0 top-0 h-screen bg-[#0F172A] items-center justify-center overflow-hidden z-0">
-     {/* Texture & Gradients covering 100% */}
      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 z-10"></div>
      
-     {/* Soft Teal/Cyan instead of Indigo - complements Orange beautifully */}
      <div className="absolute top-[-20%] right-[-10%] w-[70vw] h-[70vw] max-w-[900px] max-h-[900px] bg-teal-500/10 rounded-full blur-[120px] mix-blend-screen animate-pulse duration-[10000ms]"></div>
-
-     {/* Warm Amber/Orange accent at bottom */}
      <div className="absolute bottom-[-20%] left-[-20%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] bg-amber-600/10 rounded-full blur-[100px] mix-blend-screen"></div>
      
      <motion.div 
@@ -121,8 +116,6 @@ export default function SignupPage() {
                     </div>
                  </div>
               </div>
-
-              {/* Company Info */}
               <div className="space-y-1.5">
                  <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">Company Name</label>
                  <div className="relative group">

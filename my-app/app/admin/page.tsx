@@ -277,9 +277,6 @@ export default function AdminConsole() {
                 <button className="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 font-bold text-xs rounded-xl hover:bg-slate-50 transition-colors flex items-center gap-2 shadow-sm">
                   <RefreshCw className="w-4 h-4" /> Refresh metrics
                 </button>
-                <button onClick={() => setIsModalOpen(true)} className="px-5 py-2.5 bg-slate-900 hover:bg-orange-500 text-white font-bold text-xs rounded-xl shadow-xl shadow-slate-900/30 hover:shadow-orange-500/40 transition-all flex items-center gap-2 active:scale-95">
-                  <Plus className="w-4 h-4" /> New workspace
-                </button>
               </div>
             </div>
 

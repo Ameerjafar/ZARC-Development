@@ -3,19 +3,14 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { 
-  Zap, Mail, Lock, ArrowRight, Loader2, User, Building2, Briefcase
+  Mail, Lock, ArrowRight, Loader2, User, 
 } from "lucide-react";
 
-// --- VISUAL RIGHT SIDE (Dark Mode Style with "Welcome Back" Text) ---
 const RightSideVisuals = () => (
   <div className="hidden lg:flex lg:w-[50%] fixed right-0 top-0 h-screen bg-[#0F172A] items-center justify-center overflow-hidden z-0">
-     {/* Texture & Gradients covering 100% */}
-     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 z-10"></div>
-     
-     {/* Soft Teal/Cyan */}
-     <div className="absolute top-[-20%] right-[-10%] w-[70vw] h-[70vw] max-w-[900px] max-h-[900px] bg-teal-500/10 rounded-full blur-[120px] mix-blend-screen animate-pulse duration-[10000ms]"></div>
 
-     {/* Warm Amber/Orange accent */}
+     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 z-10"></div>
+     <div className="absolute top-[-20%] right-[-10%] w-[70vw] h-[70vw] max-w-[900px] max-h-[900px] bg-teal-500/10 rounded-full blur-[120px] mix-blend-screen animate-pulse duration-[10000ms]"></div>
      <div className="absolute bottom-[-20%] left-[-20%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] bg-amber-600/10 rounded-full blur-[100px] mix-blend-screen"></div>
      
      <motion.div 
@@ -119,10 +114,6 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-1.5">
-                 <div className="flex justify-between items-center">
-                    <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">Password</label>
-                    <a href="#" className="text-xs font-bold text-orange-600 hover:underline">Forgot?</a>
-                 </div>
                  <div className="relative group">
                     <Lock className="absolute left-4 top-4 w-5 h-5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
                     {/* VISIBLE INPUT: bg-slate-50 & border-slate-300 */}
@@ -131,6 +122,10 @@ export default function LoginPage() {
                       placeholder="••••••••" 
                       className="w-full bg-slate-50 border border-slate-300 focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-2xl pl-12 pr-4 py-4 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-orange-300" 
                     />
+                 </div>
+                 <div className="flex justify-between items-center">
+                    <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">Password</label>
+                    <a href="#" className="text-xs font-bold text-orange-600 hover:underline">Forgot Password?</a>
                  </div>
               </div>
 
@@ -144,7 +139,7 @@ export default function LoginPage() {
 
            <div className="mt-8 text-center">
               <p className="text-sm font-medium text-slate-500">
-                 Don't have a workspace? <a href="/signup" className="text-orange-600 font-bold hover:underline underline-offset-4">Create one</a>
+                 Don not have a workspace? <a href="/signup" className="text-orange-600 font-bold hover:underline underline-offset-4">Create one</a>
               </p>
            </div>
         </div>
@@ -154,7 +149,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* RIGHT SIDE (FIXED & FULL HEIGHT) */}
       <RightSideVisuals />
     </div>
   );

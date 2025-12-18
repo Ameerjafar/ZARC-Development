@@ -18,7 +18,11 @@ import {
   AlertTriangle,
   ChevronLeft,
   ChevronRight,
-  GripVertical
+  GripVertical,
+  FileText,
+  Loader2,
+  CheckSquare,
+  Square
 } from "lucide-react";
 
 // --- MOCK DATA GENERATOR ---
@@ -90,6 +94,9 @@ export default function AddIndustryPage() {
   // Drag State
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
+  // Report Generation State
+  const [generatingReports, setGeneratingReports] = useState<Record<string, boolean>>({});
+
   // --- HELPERS ---
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
     const id = Date.now();
@@ -103,8 +110,10 @@ export default function AddIndustryPage() {
 
   // --- FILTERING & PAGINATION LOGIC ---
   const filteredModules = useMemo(() => {
+    const searchLower = moduleSearch.toLowerCase();
     return modules.filter(m => 
-      m.name.toLowerCase().includes(moduleSearch.toLowerCase())
+      m.name.toLowerCase().includes(searchLower) || 
+      m.type.toLowerCase().includes(searchLower) // Added tag searching
     );
   }, [modules, moduleSearch]);
 
@@ -113,6 +122,12 @@ export default function AddIndustryPage() {
       i.name.toLowerCase().includes(industrySearch.toLowerCase())
     );
   }, [industries, industrySearch]);
+
+  // Check if all *currently filtered* modules are selected
+  const areAllFilteredSelected = useMemo(() => {
+    if (filteredModules.length === 0) return false;
+    return filteredModules.every(m => selectedModules.includes(m.id));
+  }, [filteredModules, selectedModules]);
 
   // Reset pagination when search changes
   useEffect(() => {
@@ -131,7 +146,23 @@ export default function AddIndustryPage() {
     setSelectedModules(prev => 
       prev.includes(id) ? prev.filter(m => m !== id) : [...prev, id]
     );
-    // No toast here anymore
+  };
+
+  const handleSelectAll = () => {
+    if (filteredModules.length === 0) return;
+
+    if (areAllFilteredSelected) {
+      // Deselect currently filtered modules
+      const filteredIds = filteredModules.map(m => m.id);
+      setSelectedModules(prev => prev.filter(id => !filteredIds.includes(id)));
+    } else {
+      // Select all currently filtered modules
+      const filteredIds = filteredModules.map(m => m.id);
+      setSelectedModules(prev => {
+        const newSet = new Set([...prev, ...filteredIds]);
+        return Array.from(newSet);
+      });
+    }
   };
 
   const handleCreateModule = () => {
@@ -154,11 +185,9 @@ export default function AddIndustryPage() {
     };
 
     setModules([newModule, ...modules]);
-    // NOTE: We do NOT auto-select anymore, so the user can drag it themselves.
     setIsNewModuleModalOpen(false);
     setNewModuleForm({ name: "", type: "Custom", description: "" });
     setModuleSearch(""); 
-    // No toast here as requested for "simple actions"
   };
 
   // --- DRAG AND DROP HANDLERS ---
@@ -183,7 +212,6 @@ export default function AddIndustryPage() {
     
     if (moduleId && !selectedModules.includes(moduleId)) {
       setSelectedModules(prev => [...prev, moduleId]);
-      // No toast here anymore
     }
   };
 
@@ -229,6 +257,17 @@ export default function AddIndustryPage() {
     setIndustries(prev => prev.filter(i => i.id !== id));
     showToast("Industry deleted");
     if (isEditingId === id) resetForm();
+  };
+
+  // --- HANDLER: GENERATE REPORT ---
+  const handleGenerateReport = (industryId: string, industryName: string) => {
+    setGeneratingReports(prev => ({ ...prev, [industryId]: true }));
+    showToast(`Generating analysis for ${industryName}...`);
+
+    setTimeout(() => {
+      setGeneratingReports(prev => ({ ...prev, [industryId]: false }));
+      showToast(`Report for ${industryName} ready for download`, 'success');
+    }, 2000);
   };
 
   const resetForm = () => {
@@ -395,9 +434,24 @@ export default function AddIndustryPage() {
                        type="text" 
                        value={moduleSearch}
                        onChange={(e) => setModuleSearch(e.target.value)}
-                       placeholder="Search to filter..." 
-                       className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-blue-500/20 outline-none" 
+                       placeholder="Search by name or tag..." 
+                       className="w-full pl-10 pr-32 py-2.5 bg-slate-50 border-none rounded-xl text-sm font-bold focus:ring-2 focus:ring-blue-500/20 outline-none" 
                      />
+                     {/* --- SELECT ALL BUTTON --- */}
+                     <button
+                        onClick={handleSelectAll}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-600 flex items-center gap-2 transition-all shadow-sm"
+                     >
+                       {areAllFilteredSelected ? (
+                         <>
+                           <CheckSquare className="w-3.5 h-3.5 text-blue-500" /> All Selected
+                         </>
+                       ) : (
+                         <>
+                           <Square className="w-3.5 h-3.5 text-slate-300" /> Select All
+                         </>
+                       )}
+                     </button>
                    </div>
                  </div>
                </div>
@@ -409,7 +463,7 @@ export default function AddIndustryPage() {
                      return (
                        <div 
                          key={mod.id}
-                         draggable="true" // Explicit string 'true' often works better than boolean
+                         draggable="true" 
                          onDragStart={(e: any) => handleDragStart(e, mod.id)}
                          onClick={() => toggleModule(mod.id)}
                          className={`cursor-grab active:cursor-grabbing group relative p-4 rounded-xl border-2 transition-all duration-200 ${isSelected ? 'border-blue-500 bg-blue-50 shadow-md shadow-blue-500/10' : 'border-white bg-white shadow-sm hover:border-blue-200 hover:shadow-md'}`}
@@ -492,6 +546,19 @@ export default function AddIndustryPage() {
                        </td>
                        <td className="px-6 py-4 text-right">
                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button 
+                              onClick={() => handleGenerateReport(ind.id, ind.name)}
+                              disabled={generatingReports[ind.id]}
+                              className="p-2 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
+                              title="Generate Report"
+                            >
+                              {generatingReports[ind.id] ? (
+                                <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
+                              ) : (
+                                <FileText className="w-4 h-4" />
+                              )}
+                            </button>
+                            
                             <button 
                               onClick={() => handleEditClick(ind)}
                               className="p-2 hover:bg-blue-50 text-slate-400 hover:text-blue-600 rounded-lg transition-colors" title="Edit"
