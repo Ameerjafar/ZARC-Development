@@ -66,21 +66,17 @@ const ALL_MODULES: Option[] = [
   { id: "competitor_pricing", label: "Competitor Pricing Matrix", category: "Competitor" },
   { id: "feature_gap", label: "Feature Gap Analysis", category: "Competitor" },
   { id: "market_share", label: "Market Share Breakdown", category: "Competitor" },
-  
-  // Consumer
+
   { id: "customer_persona", label: "Customer Personas", category: "Consumer" },
   { id: "sentiment_analysis", label: "Brand Sentiment Analysis", category: "Consumer" },
   
-  // Finance & VC
   { id: "ma_activity", label: "Recent M&A Activity", category: "Finance" },
   { id: "funding_trends", label: "VC Funding Trends", category: "Finance" },
-  
-  // Digital & Tech
+
   { id: "seo_gap", label: "SEO Keyword Gap", category: "Digital" },
   { id: "tech_stack", label: "Technology Stack Intel", category: "Tech" },
   { id: "app_ratings", label: "Mobile App Performance", category: "Digital" },
-  
-  // Risk & Ops
+
   { id: "regulatory", label: "Regulatory Landscape", category: "Legal" },
   { id: "supply_chain", label: "Supply Chain Risks", category: "Ops" },
   { id: "patent_landscape", label: "Patent & IP Landscape", category: "R&D" },
@@ -95,7 +91,6 @@ const SECTION_CONTENT: Record<string, string[]> = {
   ],
 };
 
-// --- Toast Component ---
 const Toast = ({ message, onClose }: { message: string; onClose: () => void }) => (
   <motion.div
     initial={{ opacity: 0, y: 50, scale: 0.9 }}
@@ -145,8 +140,8 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
   };
 
   const generateDOCX = async () => {
-    setCurrentStep(2); // Move to Generating
-    await new Promise((r) => setTimeout(r, 2000)); // Simulate API delay
+    setCurrentStep(2); 
+    await new Promise((r) => setTimeout(r, 2000)); 
 
     const docChildren: Paragraph[] = [];
     docChildren.push(
@@ -190,12 +185,10 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
     const blob = await Packer.toBlob(doc);
     saveAs(blob, `${selectedIndustry?.label.replace(/\s+/g, "_")}_Report.docx`);
 
-    setCurrentStep(3); // Move to Complete
+    setCurrentStep(3); 
     setShowToast(true);
     setTimeout(() => setShowToast(false), 4000);
   };
-
-  // Reset form when closed or restarted
   const resetForm = () => {
     setCurrentStep(0);
     setSearchQuery("");
@@ -207,7 +200,6 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -215,8 +207,6 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
             onClick={onClose}
             className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm"
           />
-
-          {/* Modal Container */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}

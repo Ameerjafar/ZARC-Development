@@ -10,6 +10,7 @@ import {
   BarChart3, 
   Code2
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // --- Components ---
 
@@ -53,19 +54,16 @@ export default function Hero() {
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 200]);
   const y2 = useTransform(scrollY, [0, 500], [0, -100]);
+  const router = useRouter();
 
   return (
     <div className="relative min-h-screen bg-[#FAFAFA] text-slate-900 overflow-hidden font-sans selection:bg-orange-100 selection:text-orange-900">
-      
-      {/* Background Decor (Orange Theme) */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-orange-500/5 rounded-full blur-3xl" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-3xl" />
       </div>
 
       <main className="relative pt-32 pb-20 px-6 max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
-        
-        {/* Left: Content */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -96,7 +94,7 @@ export default function Hero() {
 
           {/* Action Buttons (Orange Primary) */}
           <div className="flex flex-wrap items-center gap-4">
-            <button className="group relative px-8 py-4 rounded-full bg-slate-900 text-white font-semibold shadow-xl shadow-slate-900/20 overflow-hidden transition-all hover:scale-105 active:scale-95">
+            <button onClick = { () => router.push('/report')} className="group relative px-8 py-4 rounded-full bg-slate-900 text-white font-semibold shadow-xl shadow-slate-900/20 overflow-hidden transition-all hover:scale-105 active:scale-95">
               <div className="absolute inset-0 bg-orange-500/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
               <span className="relative flex items-center gap-2">
                 Get Your Report
