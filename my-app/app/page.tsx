@@ -11,7 +11,7 @@ export default function Home() {
   const [authMode, setAuthMode] = useState<"signin" | "signup" | null>(null);
 
   return (
-    <main className="min-h-screen bg-black selection:bg-blue-500/30">
+    <main className="min-h-screen  selection:bg-blue-500/30">
       <Navbar onOpenAuth={(mode) => setAuthMode(mode)} />
       <Hero />
       {/* <ReportModal 

@@ -33,7 +33,7 @@ const navLinks = [
     ]
   },
   { label: "Solutions", href: "#" },
-  { label: "admin", href: "/admin" },
+  { label: "Pricing", href: "#" }, // Added for completeness
 ];
 
 export const Navbar = ({ onOpenAuth }: NavbarProps) => {
@@ -69,10 +69,10 @@ export const Navbar = ({ onOpenAuth }: NavbarProps) => {
           transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
           className={`
             pointer-events-auto relative flex items-center gap-2 p-2 rounded-full
-            border transition-all duration-500 ease-out
+            transition-all duration-500 ease-out
             ${isScrolled
-              ? "bg-white/70 backdrop-blur-md border-slate-200/50 shadow-xl shadow-slate-500/5 supports-[backdrop-filter]:bg-white/60"
-              : "bg-white border-slate-100 shadow-sm"
+              ? "bg-white/80 backdrop-blur-xl border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5"
+              : "bg-white/50 backdrop-blur-sm border border-transparent shadow-sm ring-1 ring-black/5"
             }
           `}
           style={{
@@ -86,7 +86,7 @@ export const Navbar = ({ onOpenAuth }: NavbarProps) => {
             className="flex items-center gap-2 px-3 cursor-pointer group"
             onClick={() => window.location.href = '/'}
           >
-            <div className="w-9 h-9 bg-gradient-to-r from-orange-600 to-amber-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform duration-300">
+            <div className="w-9 h-9 bg-gradient-to-r from-orange-600 to-amber-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-orange-500/20 group-hover:scale-110 transition-transform duration-300">
               <BarChart2 className="w-5 h-5" />
             </div>
             {!searchOpen && (
@@ -102,7 +102,7 @@ export const Navbar = ({ onOpenAuth }: NavbarProps) => {
           </motion.div>
 
           {/* Vertical Divider */}
-          <motion.div layout className="w-px h-6 bg-slate-200 mx-1 hidden md:block" />
+          <motion.div layout className="w-px h-6 bg-slate-200/60 mx-1 hidden md:block" />
 
           {/* Desktop Navigation Links */}
           {!searchOpen && (
@@ -153,7 +153,7 @@ export const Navbar = ({ onOpenAuth }: NavbarProps) => {
                         <div className="bg-white/90 backdrop-blur-xl p-2 rounded-2xl shadow-xl shadow-slate-200/50 border border-white/50 ring-1 ring-slate-100 overflow-hidden">
                           {link.subItems.map((item, i) => (
                             <div key={i} className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer group/item">
-                              <div className="p-2 bg-slate-50 text-slate-500 rounded-lg group-hover/item:bg-indigo-50 group-hover/item:text-indigo-600 transition-colors">
+                              <div className="p-2 bg-slate-50 text-slate-500 rounded-lg group-hover/item:bg-orange-50 group-hover/item:text-orange-600 transition-colors">
                                 <item.icon className="w-4 h-4" />
                               </div>
                               <div>
@@ -210,7 +210,7 @@ export const Navbar = ({ onOpenAuth }: NavbarProps) => {
           >
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+                <div className="w-10 h-10 bg-orange-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-orange-500/20">
                   <BarChart2 className="w-5 h-5" />
                 </div>
                 <span className="font-bold text-xl text-slate-900">NexReport</span>
@@ -234,7 +234,7 @@ export const Navbar = ({ onOpenAuth }: NavbarProps) => {
                   className="text-2xl font-bold text-slate-900 py-4 border-b border-slate-100 flex items-center justify-between group"
                 >
                   {link.label}
-                  <ArrowRight className="w-6 h-6 -rotate-45 text-slate-300 group-hover:text-indigo-600 transition-colors" />
+                  <ArrowRight className="w-6 h-6 -rotate-45 text-slate-300 group-hover:text-orange-600 transition-colors" />
                 </motion.a>
               ))}
             </div>
@@ -247,7 +247,7 @@ export const Navbar = ({ onOpenAuth }: NavbarProps) => {
             >
               <button
                 className="w-full py-4 rounded-2xl bg-slate-50 text-slate-900 font-bold text-lg hover:bg-slate-100 transition-colors"
-                onClick  = { () => router.push('/login')}
+                onClick={() => router.push('/login')}
               >
                 Log In
               </button>
