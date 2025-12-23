@@ -96,7 +96,7 @@ export const Navbar = ({ onOpenAuth }: NavbarProps) => {
                 exit={{ opacity: 0, width: 0 }}
                 className="font-bold text-slate-800 hidden sm:block whitespace-nowrap tracking-tight"
               >
-                NexReport
+                Zarc
               </motion.span>
             )}
           </motion.div>
