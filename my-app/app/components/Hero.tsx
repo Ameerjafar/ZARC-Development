@@ -399,168 +399,165 @@ function Marquee() {
     </div>
   );
 }
-
-// --- 3. INTELLIGENCE ENGINE ---
 function IntelligenceEngine() {
   return (
-    <section className="py-32 bg-[#0B0F19] text-white overflow-hidden relative">
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-soft-light"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
+    <section className="py-32 bg-slate-50 relative overflow-hidden">
+      {/* Background Ambience */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-40 mix-blend-soft-light"></div>
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent" />
+      <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent" />
+      
+      {/* Center Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[800px] bg-orange-100/40 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-20 items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            className="space-y-8"
-          >
-            <div className="inline-flex items-center gap-3 text-emerald-400 font-mono text-xs border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 rounded-full">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              SYSTEM ONLINE_V2.4
-            </div>
+        
+        {/* Section Header */}
+        <div className="text-center max-w-3xl mx-auto mb-20">
+           <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">
+             The <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-500">Intelligence Engine</span>
+           </h2>
+           <p className="text-lg text-slate-500">
+             Our proprietary stack transforms chaos into clarity. Three layers of processing power working in perfect unison.
+           </p>
+        </div>
 
-            <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
-              The Intelligence <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-blue-400 to-cyan-400">
-                Engine v2.0
-              </span>
-            </h2>
-
-            <p className="text-slate-400 text-lg leading-relaxed max-w-lg">
-              Zarc doesn't just scrape data. It perceives market shifts in
-              real-time using a proprietary neural network trained on 500TB of
-              global business registry data.
-            </p>
-
-            <ul className="space-y-5 pt-4">
-              {[
-                { text: "Real-time Entity Resolution", icon: ScanLine },
-                { text: "Predictive Market Scoring", icon: TrendingUp },
-                { text: "Cross-border Compliance Check", icon: ShieldCheck },
-              ].map((item, i) => (
-                <motion.li
-                  key={i}
-                  initial={{ opacity: 0, x: -10 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  className="flex items-center gap-4 text-slate-300 font-medium group"
-                >
-                  <div className="p-2 rounded-lg bg-slate-800 group-hover:bg-indigo-500/20 transition-colors">
-                    <item.icon className="w-5 h-5 text-indigo-400" />
-                  </div>
-                  {item.text}
-                </motion.li>
-              ))}
-            </ul>
-          </motion.div>
-
-          {/* Visualization Side */}
-          <div className="relative perspective-1000">
-            <motion.div
-              whileHover={{ rotateY: -2, rotateX: 2 }}
-              className="bg-[#121622] border border-slate-700/50 rounded-xl overflow-hidden shadow-2xl shadow-indigo-500/10 relative"
-            >
-              {/* Header */}
-              <div className="h-10 bg-[#0F121C] border-b border-slate-800 flex items-center px-4 gap-2">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
-                </div>
-                <div className="ml-auto flex items-center gap-2 text-[10px] text-slate-500 font-mono tracking-widest">
-                  <Activity className="w-3 h-3 text-indigo-500" />
-                  LIVE_FEED
-                </div>
+        {/* The Bento Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 grid-rows-2 gap-6 h-[800px] md:h-[600px]">
+           
+           {/* Card 1: Data Ingestion (Tall Left) */}
+           <motion.div 
+             initial={{ opacity: 0, y: 20 }}
+             whileInView={{ opacity: 1, y: 0 }}
+             viewport={{ once: true }}
+             className="md:row-span-2 bg-white rounded-3xl p-8 border border-slate-200 shadow-xl shadow-slate-200/50 flex flex-col relative overflow-hidden group"
+           >
+              <div className="absolute inset-0 bg-gradient-to-b from-orange-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              
+              <div className="mb-auto z-10">
+                 <div className="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center mb-6">
+                    <Database className="w-6 h-6 text-orange-600" />
+                 </div>
+                 <h3 className="text-xl font-bold text-slate-900 mb-2">1. Ingestion</h3>
+                 <p className="text-sm text-slate-500 leading-relaxed">
+                    Continuous scanning of 50M+ global data points from registries, news, and satellite feeds.
+                 </p>
               </div>
 
-              {/* Terminal Content */}
-              <div className="p-6 font-mono text-xs space-y-4 h-[350px] overflow-hidden relative">
-                {/* Scanning Line */}
-                <motion.div
-                  animate={{ top: ["0%", "100%", "0%"] }}
-                  transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-                  className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500 to-transparent shadow-[0_0_15px_rgba(99,102,241,0.8)] z-10 opacity-50"
-                />
+              {/* Visual: Scrolling Data Stream */}
+              <div className="mt-8 relative h-full w-full overflow-hidden mask-linear-fade">
+                 <div className="space-y-3 animate-scroll-vertical">
+                    {[...Array(10)].map((_, i) => (
+                       <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                          <div className="w-2 h-2 rounded-full bg-slate-300" />
+                          <div className="h-2 w-24 bg-slate-200 rounded-full" />
+                          <div className="ml-auto h-2 w-8 bg-orange-200 rounded-full" />
+                       </div>
+                    ))}
+                 </div>
+              </div>
+           </motion.div>
 
-                <div className="text-slate-500 mb-4">
-                  <span className="text-emerald-400 font-bold">
-                    root@zarc-ai:~$
-                  </span>{" "}
-                  initializing_neural_net --verbose
-                </div>
+           {/* Card 2: Neural Processing (Wide Top Right) */}
+           <motion.div 
+             initial={{ opacity: 0, y: 20 }}
+             whileInView={{ opacity: 1, y: 0 }}
+             viewport={{ once: true }}
+             transition={{ delay: 0.1 }}
+             className="md:col-span-2 bg-slate-900 rounded-3xl p-8 border border-slate-800 shadow-2xl flex flex-col md:flex-row items-center justify-between relative overflow-hidden"
+           >
+              {/* Dark aesthetic for the "Core" */}
+              <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+              <div className="absolute -right-20 -top-20 w-96 h-96 bg-orange-500/20 rounded-full blur-[80px]" />
 
-                <div className="space-y-2">
-                  {[
-                    {
-                      label: "Parsing SEC Filings",
-                      status: "COMPLETE",
-                      color: "text-emerald-400",
-                      time: "14ms",
-                    },
-                    {
-                      label: "Analyzing Sentiment (Twitter/X)",
-                      status: "ACTIVE",
-                      color: "text-amber-400",
-                      time: "89ms",
-                    },
-                    {
-                      label: "Indexing GST Records",
-                      status: "PENDING",
-                      color: "text-slate-600",
-                      time: "--",
-                    },
-                    {
-                      label: "Geospatial Heatmap",
-                      status: "RENDERING",
-                      color: "text-blue-400",
-                      time: "120ms",
-                    },
-                  ].map((line, i) => (
-                    <div
-                      key={i}
-                      className="flex justify-between items-center border-b border-slate-800/40 pb-2"
-                    >
-                      <span className="text-slate-300 flex items-center gap-2">
-                        <span className="opacity-30">›</span> {line.label}
-                      </span>
-                      <div className="flex items-center gap-4">
-                        <span className="text-slate-600 text-[10px]">
-                          {line.time}
-                        </span>
-                        <span className={`${line.color} font-bold`}>
-                          {line.status}
-                        </span>
-                      </div>
+              <div className="relative z-10 max-w-sm">
+                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-900/30 border border-orange-500/30 text-orange-400 text-xs font-bold mb-6">
+                    <Zap className="w-3 h-3" /> CORE PROCESSOR
+                 </div>
+                 <h3 className="text-2xl font-bold text-white mb-2">2. Neural Analysis</h3>
+                 <p className="text-sm text-slate-400 leading-relaxed">
+                    Our AI models cross-reference raw data against historical success patterns to identify high-probability opportunities.
+                 </p>
+              </div>
+
+              {/* Visual: Network Node */}
+              <div className="relative z-10 mt-8 md:mt-0">
+                 <div className="relative w-48 h-48 flex items-center justify-center">
+                    <div className="absolute inset-0 border border-white/10 rounded-full animate-[spin_10s_linear_infinite]" />
+                    <div className="absolute inset-4 border border-white/10 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
+                    <div className="absolute inset-0 rounded-full bg-orange-500/5 blur-xl animate-pulse" />
+                    
+                    <div className="w-24 h-24 bg-gradient-to-br from-orange-500 to-amber-600 rounded-full flex items-center justify-center shadow-lg shadow-orange-500/20 relative z-20">
+                       <Cpu className="w-10 h-10 text-white" />
                     </div>
-                  ))}
-                </div>
 
-                {/* Live Data Stream Simulation */}
-                <div className="pt-6 space-y-2">
-                  <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-2">
-                    Incoming Data Stream
-                  </div>
-                  <div className="flex gap-4 text-[10px] bg-slate-800/30 p-2 rounded border border-slate-800">
-                    <span className="text-blue-400">#TS_10293</span>
-                    <span className="text-slate-300">Sector: FINTECH</span>
-                    <span className="text-emerald-400 ml-auto">
-                      +12.4% Growth
-                    </span>
-                  </div>
-                  <div className="flex gap-4 text-[10px] bg-slate-800/30 p-2 rounded border border-slate-800">
-                    <span className="text-blue-400">#TS_10294</span>
-                    <span className="text-slate-300">Sector: AGRI</span>
-                    <span className="text-red-400 ml-auto">-0.4% Dip</span>
-                  </div>
-                </div>
+                    {/* Orbiting particles */}
+                    <div className="absolute top-0 left-1/2 w-2 h-2 bg-white rounded-full -translate-x-1/2 -translate-y-1 shadow-[0_0_10px_white]" />
+                 </div>
               </div>
-            </motion.div>
-          </div>
+           </motion.div>
+
+           {/* Card 3: Output/Delivery (Bottom Center) */}
+           <motion.div 
+             initial={{ opacity: 0, y: 20 }}
+             whileInView={{ opacity: 1, y: 0 }}
+             viewport={{ once: true }}
+             transition={{ delay: 0.2 }}
+             className="bg-white rounded-3xl p-8 border border-slate-200 shadow-xl shadow-slate-200/50 flex flex-col justify-between group overflow-hidden"
+           >
+               <div className="relative z-10">
+                  <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center mb-6">
+                     <FileText className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">3. Strategic Report</h3>
+                  <p className="text-sm text-slate-500">
+                     Actionable PDF blueprints generated in seconds.
+                  </p>
+               </div>
+               <div className="mt-6 flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100 group-hover:border-blue-200 transition-colors">
+                  <div className="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center font-bold text-xs text-red-500">PDF</div>
+                  <div className="flex-1">
+                     <div className="h-2 w-20 bg-slate-200 rounded-full mb-1" />
+                     <div className="h-1.5 w-12 bg-slate-100 rounded-full" />
+                  </div>
+                  <Download className="w-4 h-4 text-slate-400 group-hover:text-blue-500 transition-colors" />
+               </div>
+           </motion.div>
+
+           {/* Card 4: Accuracy/Stats (Bottom Right) */}
+           <motion.div 
+             initial={{ opacity: 0, y: 20 }}
+             whileInView={{ opacity: 1, y: 0 }}
+             viewport={{ once: true }}
+             transition={{ delay: 0.3 }}
+             className="bg-gradient-to-br from-orange-500 to-amber-500 rounded-3xl p-8 shadow-xl shadow-orange-500/20 flex flex-col justify-center items-center text-center text-white relative overflow-hidden"
+           >
+               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+               
+               <div className="relative z-10">
+                  <div className="text-5xl font-black mb-2 tracking-tighter">99.9%</div>
+                  <div className="text-orange-100 font-medium text-sm uppercase tracking-widest opacity-80">Uptime</div>
+                  <div className="mt-6 inline-flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-4 py-1.5 text-xs font-bold border border-white/20">
+                     <Globe2 className="w-3 h-3" /> Global Coverage
+                  </div>
+               </div>
+           </motion.div>
+
         </div>
       </div>
+
+      <style jsx>{`
+        .mask-linear-fade {
+           mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        }
+        @keyframes scroll-vertical {
+           0% { transform: translateY(0); }
+           100% { transform: translateY(-50%); }
+        }
+        .animate-scroll-vertical {
+           animation: scroll-vertical 20s linear infinite;
+        }
+      `}</style>
     </section>
   );
 }
