@@ -69,7 +69,7 @@ const ALL_MODULES: Option[] = [
 
   { id: "customer_persona", label: "Customer Personas", category: "Consumer" },
   { id: "sentiment_analysis", label: "Brand Sentiment Analysis", category: "Consumer" },
-  
+
   { id: "ma_activity", label: "Recent M&A Activity", category: "Finance" },
   { id: "funding_trends", label: "VC Funding Trends", category: "Finance" },
 
@@ -140,8 +140,23 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
   };
 
   const generateDOCX = async () => {
-    setCurrentStep(2); 
-    await new Promise((r) => setTimeout(r, 2000)); 
+    setCurrentStep(2);
+    await new Promise((r) => setTimeout(r, 2000));
+
+    // Add to in-memory history
+    const newReport = {
+      id: crypto.randomUUID(),
+      title: `${selectedIndustry?.label || "Market"} Analysis`,
+      industry: selectedIndustry?.label || "General",
+      createdAt: new Date(),
+      fileSize: `${(Math.random() * 5 + 1).toFixed(1)} MB`,
+      status: "completed" as const,
+      modules: selectedModules.map(m => m.label)
+    };
+
+    // Dynamically import to ensure we get the fresh module
+    const { addReport } = await import("../data/reports");
+    addReport(newReport);
 
     const docChildren: Paragraph[] = [];
     docChildren.push(
@@ -159,7 +174,7 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
         spacing: { after: 400 },
         run: { size: 28, bold: true },
       }),
-       new Paragraph({
+      new Paragraph({
         text: `Generated on ${new Date().toLocaleDateString()}`,
         alignment: AlignmentType.CENTER,
         spacing: { after: 800 },
@@ -185,7 +200,7 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
     const blob = await Packer.toBlob(doc);
     saveAs(blob, `${selectedIndustry?.label.replace(/\s+/g, "_")}_Report.docx`);
 
-    setCurrentStep(3); 
+    setCurrentStep(3);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 4000);
   };
@@ -214,7 +229,7 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
             className="fixed inset-0 z-[60] flex items-center justify-center p-4 pointer-events-none"
           >
             <div className="pointer-events-auto w-full max-w-5xl bg-white rounded-3xl shadow-2xl flex overflow-hidden h-[85vh] border border-slate-100">
-              
+
               {/* --- LEFT SIDEBAR --- */}
               <div className="w-72 bg-slate-50 border-r border-slate-200 p-8 flex flex-col hidden md:flex">
                 <div className="mb-10">
@@ -225,12 +240,12 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
 
                 {/* Vertical Stepper */}
                 <div className="space-y-8 relative">
-                   {/* Connecting Line */}
-                   <div className="absolute left-[19px] top-4 bottom-4 w-0.5 bg-slate-200" />
-                   <div 
-                     className="absolute left-[19px] top-4 w-0.5 bg-orange-500 transition-all duration-500"
-                     style={{ height: `${Math.min(currentStep, steps.length - 1) * 25}%` }} 
-                   />
+                  {/* Connecting Line */}
+                  <div className="absolute left-[19px] top-4 bottom-4 w-0.5 bg-slate-200" />
+                  <div
+                    className="absolute left-[19px] top-4 w-0.5 bg-orange-500 transition-all duration-500"
+                    style={{ height: `${Math.min(currentStep, steps.length - 1) * 25}%` }}
+                  />
 
                   {steps.map((step, index) => {
                     const isActive = index === currentStep;
@@ -244,8 +259,8 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
                             ${isActive
                               ? "bg-orange-500 border-orange-500 text-white shadow-lg scale-110"
                               : isCompleted
-                              ? "bg-white border-orange-500 text-orange-500"
-                              : "bg-white border-slate-200 text-slate-300"
+                                ? "bg-white border-orange-500 text-orange-500"
+                                : "bg-white border-slate-200 text-slate-300"
                             }`}
                         >
                           {isCompleted ? <Check className="w-5 h-5" /> : <Icon className="w-4 h-4" />}
@@ -274,7 +289,7 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
                   <div className="flex flex-col h-full p-10">
                     <h2 className="text-3xl font-black text-slate-900 mb-2">Select Industry</h2>
                     <p className="text-slate-500 mb-8">Which market sector are you analyzing?</p>
-                    
+
                     <div className="relative mb-6">
                       <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                       <input
@@ -289,8 +304,8 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
 
                     <div className="grid grid-cols-2 gap-4 overflow-y-auto pr-2">
                       {filteredIndustries.map((ind) => {
-                         const Icon = ind.icon || Building2;
-                         return (
+                        const Icon = ind.icon || Building2;
+                        return (
                           <button
                             key={ind.id}
                             onClick={() => {
@@ -326,9 +341,8 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
                           <button
                             key={mod.id}
                             onClick={() => toggleModule(mod)}
-                            className={`p-4 rounded-xl border text-left flex justify-between items-center transition-all ${
-                              isSelected ? "border-orange-500 bg-orange-50 ring-1 ring-orange-500" : "hover:border-orange-300"
-                            }`}
+                            className={`p-4 rounded-xl border text-left flex justify-between items-center transition-all ${isSelected ? "border-orange-500 bg-orange-50 ring-1 ring-orange-500" : "hover:border-orange-300"
+                              }`}
                           >
                             <div>
                               <div className="font-bold text-sm text-slate-800">{mod.label}</div>
@@ -367,11 +381,11 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
                       {currentStep === 2 ? "Generating Intelligence..." : "Report Ready!"}
                     </h3>
                     <p className="text-slate-500 max-w-xs mx-auto mb-8">
-                      {currentStep === 2 
-                        ? "Synthesizing data points and formatting your DOCX file." 
+                      {currentStep === 2
+                        ? "Synthesizing data points and formatting your DOCX file."
                         : "Your file has been downloaded successfully."}
                     </p>
-                    
+
                     {currentStep === 3 && (
                       <button onClick={resetForm} className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold flex items-center gap-2">
                         <Plus className="w-4 h-4" /> Create Another
