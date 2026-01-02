@@ -1,11 +1,4 @@
-export interface Report {
-  id: string;
-  title: string;
-  industry: string;
-  createdAt: Date;
-  fileSize: string;
-  modules: string[];
-}
+import { Report } from "../types/reporting";
 
 export const MOCK_REPORTS: Report[] = [
   {
