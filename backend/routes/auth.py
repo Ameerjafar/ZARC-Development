@@ -11,7 +11,19 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
 @router.post("/signup", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 async def signup(request: SignUpRequest, db: Session = Depends(get_db)):
+    """
+    Register a new user
+    
+    - **email**: Email address
+    - **username**: Username
+    - **password**: Password
+    - **first_name**: First name (optional)
+    - **last_name**: Last name (optional)
+    - **company**: Company (optional)
+    - **industry**: Industry (optional)
+    """
     existing_user = db.query(User).filter(User.email == request.email).first()
+    print("exitingUser", existing_user)
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -34,14 +46,10 @@ async def signup(request: SignUpRequest, db: Session = Depends(get_db)):
         company=request.company,
         industry=request.industry
     )
-    
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-
     access_token = create_access_token(data={"sub": str(new_user.id), "email": new_user.email})
-    
-    # Return token and user data
     return TokenResponse(
         access_token=access_token,
         user=UserResponse.model_validate(new_user)
