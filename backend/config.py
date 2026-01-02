@@ -1,26 +1,22 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import List
-
+from pydantic_settings import BaseSettings
+from typing import Optional
 
 class Settings(BaseSettings):
-    """Application settings loaded from environment variables"""
+    """Zarc API Settings - Loads from .env"""
     
-    # JWT Configuration
-    SECRET_KEY: str = "your-secret-key-change-this-in-production"
+    # REQUIRED - No defaults for production DB
+    DATABASE_URL: str  
+    SECRET_KEY: str
+    
+    # Optional with safe defaults
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
-    
-    # Database Configuration
-    DATABASE_URL: str = "sqlite:///./zarc.db"
-    
-    # CORS Configuration
     FRONTEND_URL: str = "http://localhost:3000"
     
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        case_sensitive=True,
-        extra="ignore"
-    )
-
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+        case_sensitive = False  # DATABASE_URL = database_url
+        extra = "ignore"
 
 settings = Settings()
