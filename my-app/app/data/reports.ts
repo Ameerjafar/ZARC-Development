@@ -56,9 +56,6 @@ export const MOCK_REPORTS: Report[] = [
     modules: ["Financial Projections", "SWOT Analysis"],
   },
 ];
-
-// --- ADD THIS FUNCTION TO FIX THE ERROR ---
 export const addReport = (newReport: Report) => {
-  // Add the new report to the beginning of the array
   MOCK_REPORTS.unshift(newReport);
 };

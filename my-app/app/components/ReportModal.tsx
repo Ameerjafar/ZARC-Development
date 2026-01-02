@@ -2,15 +2,6 @@
 
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { saveAs } from "file-saver";
-import {
-  Document,
-  Packer,
-  Paragraph,
-  HeadingLevel,
-  TextRun,
-  AlignmentType,
-} from "docx";
 import {
   X,
   Search,
@@ -30,9 +21,10 @@ import {
   Cpu,
   ShieldCheck,
   CheckSquare,
-  Square
+  Square,
+  FileText
 } from "lucide-react";
-import { useRouter } from "next/navigation"; // Import router
+import { useRouter } from "next/navigation";
 
 // --- Types ---
 interface Option {
@@ -79,15 +71,6 @@ const ALL_MODULES: Option[] = [
   { id: "patent_landscape", label: "Patent & IP Landscape", category: "R&D" },
 ];
 
-const SECTION_CONTENT: Record<string, string[]> = {
-  default: [
-    "Market consolidation is accelerating, with larger players acquiring innovative startups.",
-    "Customer acquisition costs (CAC) have increased by approximately 12% in the last fiscal year.",
-    "Emerging regulatory frameworks are creating new compliance barriers for entrants.",
-    "Digital-first adoption is becoming the primary driver of revenue growth across the sector.",
-  ],
-};
-
 const Toast = ({ message, onClose }: { message: string; onClose: () => void }) => (
   <motion.div
     initial={{ opacity: 0, y: 50, scale: 0.9 }}
@@ -109,6 +92,8 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
   const [selectedIndustry, setSelectedIndustry] = useState<Option | null>(null);
   const [selectedModules, setSelectedModules] = useState<Option[]>([]);
   const [showToast, setShowToast] = useState(false);
+  const [generatedReportId, setGeneratedReportId] = useState<string | null>(null);
+
   const router = useRouter();
 
   const steps = [
@@ -145,8 +130,9 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
     }
   };
 
-  const generateAndRedirect = async () => {
-    setCurrentStep(2);
+  const startGeneration = async () => {
+    setCurrentStep(2); // Go to loading screen
+
     // Simulate generation delay
     await new Promise((r) => setTimeout(r, 2000));
 
@@ -161,26 +147,19 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
       status: "completed" as const,
       modules: selectedModules.map(m => m.label)
     };
-
-    // Add to history (dynamically imported)
     const { addReport } = await import("../data/reports");
     addReport(newReport);
 
-    setCurrentStep(3);
+    setGeneratedReportId(reportId);
+    setCurrentStep(3); // Go to "Ready" screen
     setShowToast(true);
-
-    // Auto redirect after short delay or via button
-    setTimeout(() => {
-      onClose();
-      router.push(`/report-view/${reportId}`);
-    }, 1500);
   };
 
-  const resetForm = () => {
-    setCurrentStep(0);
-    setSearchQuery("");
-    setSelectedIndustry(null);
-    setSelectedModules([]);
+  const handleViewReport = () => {
+    if (generatedReportId) {
+      onClose();
+      router.push(`/report-view/${generatedReportId}`);
+    }
   };
 
   return (
@@ -343,37 +322,56 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
 
                     <div className="flex justify-between pt-6 border-t mt-4">
                       <button onClick={() => setCurrentStep(0)} className="text-slate-500 font-bold hover:text-slate-800">Back</button>
+
+                      {/* Changed to "Generate Report" here, which triggers the process */}
                       <button
-                        onClick={generateAndRedirect}
+                        onClick={startGeneration}
                         disabled={selectedModules.length === 0}
                         className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold flex items-center gap-2 hover:bg-slate-800 disabled:opacity-50"
                       >
-                        View Report <ArrowRight className="w-4 h-4" />
+                        Generate Report <ArrowRight className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
                 )}
 
-                {/* STEP 2 & 3: LOADING / SUCCESS */}
-                {(currentStep === 2 || currentStep === 3) && (
+                {/* STEP 2: LOADING */}
+                {currentStep === 2 && (
                   <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
-                    {currentStep === 2 ? (
-                      <div className="w-20 h-20 border-4 border-slate-100 border-t-orange-500 rounded-full animate-spin mb-6" />
-                    ) : (
-                      <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-6">
-                        <Check className="w-10 h-10" />
-                      </div>
-                    )}
+                    <div className="w-20 h-20 border-4 border-slate-100 border-t-orange-500 rounded-full animate-spin mb-6" />
                     <h3 className="text-2xl font-black text-slate-900 mb-2">
-                      {currentStep === 2 ? "Generating Intelligence..." : "Report Ready!"}
+                      Generating Intelligence...
                     </h3>
-                    <p className="text-slate-500 max-w-xs mx-auto mb-8">
-                      {currentStep === 2
-                        ? "Synthesizing data points and creating your report."
-                        : "Redirecting you to the report view..."}
+                    <p className="text-slate-500 max-w-xs mx-auto">
+                      Synthesizing data points and creating your report.
                     </p>
                   </div>
                 )}
+
+                {/* STEP 3: SUCCESS & VIEW ACTION */}
+                {currentStep === 3 && (
+                  <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+                    <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-6 animate-in zoom-in duration-300">
+                      <Check className="w-10 h-10" />
+                    </div>
+                    <h3 className="text-3xl font-black text-slate-900 mb-2">
+                      Report Ready!
+                    </h3>
+                    <p className="text-slate-500 max-w-md mx-auto mb-8">
+                      Your market intelligence dossier has been successfully generated and saved to your library.
+                    </p>
+
+                    {/* THE EXPLICIT "VIEW REPORT" BUTTON */}
+                    <button
+                      onClick={handleViewReport}
+                      className="px-8 py-4 bg-orange-600 text-white text-lg rounded-2xl font-bold shadow-xl shadow-orange-500/20 hover:scale-105 hover:bg-orange-700 transition-all flex items-center gap-3"
+                    >
+                      <FileText className="w-5 h-5" />
+                      View Report Now
+                    </button>
+                  </div>
+                )}
+
               </div>
             </div>
           </motion.div>
