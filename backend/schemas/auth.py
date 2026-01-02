@@ -5,10 +5,13 @@ import re
 
 
 class SignUpRequest(BaseModel):
-    """Request schema for user signup"""
     email: EmailStr
     username: str = Field(..., min_length=3, max_length=50)
     password: str = Field(..., min_length=8, max_length=72)
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    company: Optional[str] = None
+    industry: Optional[str] = None
     
     @field_validator('username')
     @classmethod
@@ -31,7 +34,7 @@ class SignUpRequest(BaseModel):
 
 class SignInRequest(BaseModel):
     """Request schema for user signin"""
-    email: str  # Can be email or username
+    email: str  
     password: str
 
 
@@ -40,6 +43,10 @@ class UserResponse(BaseModel):
     id: int
     email: str
     username: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    company: Optional[str] = None
+    industry: Optional[str] = None
     created_at: datetime
     
     class Config:

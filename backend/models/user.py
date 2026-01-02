@@ -11,6 +11,10 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     username = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
+    first_name = Column(String, nullable=True)
+    last_name = Column(String, nullable=True)
+    company = Column(String, nullable=True)
+    industry = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     
     def __repr__(self):
