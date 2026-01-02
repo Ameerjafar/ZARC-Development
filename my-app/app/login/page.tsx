@@ -68,7 +68,7 @@ export default function LoginPage() {
             method: "POST",
             body: JSON.stringify({ email, password }),
          });
-
+         localStorage.setItem("token", data.access_token);
          login(data.access_token, data.user);
       } catch (err: any) {
          setError(err.message || "Failed to sign in. Please check your credentials.");

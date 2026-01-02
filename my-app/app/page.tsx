@@ -2,10 +2,7 @@
 
 import { useState } from "react";
 import { Navbar } from "./components/Navbar";
-import Hero  from "./components/Hero";
-// import  { ReportModal }  from "./components/ReportModal";
-import { AuthModal } from "./components/AuthModal";
-
+import Hero from "./components/Hero";
 export default function Home() {
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"signin" | "signup" | null>(null);
@@ -18,7 +15,7 @@ export default function Home() {
         isOpen={isReportOpen} 
         onClose={() => setIsReportOpen(false)} 
       /> */}
-      
+
     </main>
   );
 }

@@ -28,8 +28,11 @@ import {
   Box,
   Globe2,
   Cpu,
-  ShieldCheck
+  ShieldCheck,
+  CheckSquare,
+  Square
 } from "lucide-react";
+import { useRouter } from "next/navigation"; // Import router
 
 // --- Types ---
 interface Option {
@@ -56,27 +59,21 @@ const ALL_INDUSTRIES: Option[] = [
   { id: "gaming", label: "Gaming & Esports", icon: Cpu },
 ];
 
-
 const ALL_MODULES: Option[] = [
   { id: "tam_sam_som", label: "Market Size (TAM/SAM/SOM)", category: "Market" },
   { id: "growth_forecast", label: "5-Year Growth Forecast", category: "Market" },
   { id: "swot", label: "SWOT Analysis", category: "Strategy" },
   { id: "pestle", label: "PESTLE Framework", category: "Strategy" },
-
   { id: "competitor_pricing", label: "Competitor Pricing Matrix", category: "Competitor" },
   { id: "feature_gap", label: "Feature Gap Analysis", category: "Competitor" },
   { id: "market_share", label: "Market Share Breakdown", category: "Competitor" },
-
   { id: "customer_persona", label: "Customer Personas", category: "Consumer" },
   { id: "sentiment_analysis", label: "Brand Sentiment Analysis", category: "Consumer" },
-
   { id: "ma_activity", label: "Recent M&A Activity", category: "Finance" },
   { id: "funding_trends", label: "VC Funding Trends", category: "Finance" },
-
   { id: "seo_gap", label: "SEO Keyword Gap", category: "Digital" },
   { id: "tech_stack", label: "Technology Stack Intel", category: "Tech" },
   { id: "app_ratings", label: "Mobile App Performance", category: "Digital" },
-
   { id: "regulatory", label: "Regulatory Landscape", category: "Legal" },
   { id: "supply_chain", label: "Supply Chain Risks", category: "Ops" },
   { id: "patent_landscape", label: "Patent & IP Landscape", category: "R&D" },
@@ -112,12 +109,13 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
   const [selectedIndustry, setSelectedIndustry] = useState<Option | null>(null);
   const [selectedModules, setSelectedModules] = useState<Option[]>([]);
   const [showToast, setShowToast] = useState(false);
+  const router = useRouter();
 
   const steps = [
     { label: "Select Industry", description: "Choose market sector", icon: Building2 },
     { label: "Choose Modules", description: "Select data points", icon: Grid },
     { label: "Synthesizing", description: "AI processing...", icon: Loader2 },
-    { label: "Ready", description: "Download complete", icon: CheckCircle2 },
+    { label: "Ready", description: "Report generated", icon: CheckCircle2 },
   ];
 
   // Filtering Logic
@@ -139,13 +137,23 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
     });
   };
 
-  const generateDOCX = async () => {
+  const toggleAllModules = () => {
+    if (selectedModules.length === filteredModules.length) {
+      setSelectedModules([]);
+    } else {
+      setSelectedModules([...filteredModules]);
+    }
+  };
+
+  const generateAndRedirect = async () => {
     setCurrentStep(2);
+    // Simulate generation delay
     await new Promise((r) => setTimeout(r, 2000));
 
-    // Add to in-memory history
+    // Create report object
+    const reportId = crypto.randomUUID();
     const newReport = {
-      id: crypto.randomUUID(),
+      id: reportId,
       title: `${selectedIndustry?.label || "Market"} Analysis`,
       industry: selectedIndustry?.label || "General",
       createdAt: new Date(),
@@ -154,56 +162,20 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
       modules: selectedModules.map(m => m.label)
     };
 
-    // Dynamically import to ensure we get the fresh module
+    // Add to history (dynamically imported)
     const { addReport } = await import("../data/reports");
     addReport(newReport);
 
-    const docChildren: Paragraph[] = [];
-    docChildren.push(
-      new Paragraph({
-        text: "MARKET INTELLIGENCE REPORT",
-        heading: HeadingLevel.HEADING_1,
-        alignment: AlignmentType.CENTER,
-        spacing: { after: 200 },
-        run: { size: 32, bold: true, color: "ED7D31" },
-      }),
-      new Paragraph({
-        text: (selectedIndustry?.label || "Market").toUpperCase(),
-        heading: HeadingLevel.HEADING_2,
-        alignment: AlignmentType.CENTER,
-        spacing: { after: 400 },
-        run: { size: 28, bold: true },
-      }),
-      new Paragraph({
-        text: `Generated on ${new Date().toLocaleDateString()}`,
-        alignment: AlignmentType.CENTER,
-        spacing: { after: 800 },
-        run: { size: 20, color: "666666" },
-      })
-    );
-
-    selectedModules.forEach((mod) => {
-      docChildren.push(
-        new Paragraph({
-          text: mod.label.toUpperCase(),
-          heading: HeadingLevel.HEADING_2,
-          spacing: { before: 400, after: 200 },
-          run: { color: "ED7D31" },
-        })
-      );
-      SECTION_CONTENT.default.forEach((text) => {
-        docChildren.push(new Paragraph({ children: [new TextRun(text)], spacing: { after: 120 } }));
-      });
-    });
-
-    const doc = new Document({ sections: [{ children: docChildren }] });
-    const blob = await Packer.toBlob(doc);
-    saveAs(blob, `${selectedIndustry?.label.replace(/\s+/g, "_")}_Report.docx`);
-
     setCurrentStep(3);
     setShowToast(true);
-    setTimeout(() => setShowToast(false), 4000);
+
+    // Auto redirect after short delay or via button
+    setTimeout(() => {
+      onClose();
+      router.push(`/report-view/${reportId}`);
+    }, 1500);
   };
+
   const resetForm = () => {
     setCurrentStep(0);
     setSearchQuery("");
@@ -240,11 +212,10 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
 
                 {/* Vertical Stepper */}
                 <div className="space-y-8 relative">
-                  {/* Connecting Line */}
                   <div className="absolute left-[19px] top-4 bottom-4 w-0.5 bg-slate-200" />
                   <div
                     className="absolute left-[19px] top-4 w-0.5 bg-orange-500 transition-all duration-500"
-                    style={{ height: `${Math.min(currentStep, steps.length - 1) * 25}%` }}
+                    style={{ height: `${Math.min(currentStep, steps.length - 1) * 33}%` }}
                   />
 
                   {steps.map((step, index) => {
@@ -329,9 +300,25 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
                 {/* STEP 1: MODULE SELECTION */}
                 {currentStep === 1 && (
                   <div className="flex flex-col h-full p-10">
-                    <h2 className="text-3xl font-black text-slate-900 mb-2">Add Data Modules</h2>
-                    <div className="flex items-center gap-2 mb-6 text-sm text-slate-500">
-                      Sector: <span className="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded">{selectedIndustry?.label}</span>
+                    <div className="flex justify-between items-end mb-6">
+                      <div>
+                        <h2 className="text-3xl font-black text-slate-900 mb-2">Add Data Modules</h2>
+                        <div className="flex items-center gap-2 text-sm text-slate-500">
+                          Sector: <span className="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded">{selectedIndustry?.label}</span>
+                        </div>
+                      </div>
+
+                      {/* SELECT ALL BUTTON */}
+                      <button
+                        onClick={toggleAllModules}
+                        className="text-sm font-bold text-orange-600 hover:text-orange-700 hover:bg-orange-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-2"
+                      >
+                        {selectedModules.length === filteredModules.length ? (
+                          <><CheckSquare className="w-4 h-4" /> Deselect All</>
+                        ) : (
+                          <><Square className="w-4 h-4" /> Select All</>
+                        )}
+                      </button>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 mb-auto overflow-y-auto pr-2 pb-4">
@@ -357,11 +344,11 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
                     <div className="flex justify-between pt-6 border-t mt-4">
                       <button onClick={() => setCurrentStep(0)} className="text-slate-500 font-bold hover:text-slate-800">Back</button>
                       <button
-                        onClick={generateDOCX}
+                        onClick={generateAndRedirect}
                         disabled={selectedModules.length === 0}
                         className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold flex items-center gap-2 hover:bg-slate-800 disabled:opacity-50"
                       >
-                        Generate Report <ArrowRight className="w-4 h-4" />
+                        View Report <ArrowRight className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -382,22 +369,16 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
                     </h3>
                     <p className="text-slate-500 max-w-xs mx-auto mb-8">
                       {currentStep === 2
-                        ? "Synthesizing data points and formatting your DOCX file."
-                        : "Your file has been downloaded successfully."}
+                        ? "Synthesizing data points and creating your report."
+                        : "Redirecting you to the report view..."}
                     </p>
-
-                    {currentStep === 3 && (
-                      <button onClick={resetForm} className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold flex items-center gap-2">
-                        <Plus className="w-4 h-4" /> Create Another
-                      </button>
-                    )}
                   </div>
                 )}
               </div>
             </div>
           </motion.div>
 
-          {showToast && <Toast message="Report downloaded successfully!" onClose={() => setShowToast(false)} />}
+          {showToast && <Toast message="Report generated successfully!" onClose={() => setShowToast(false)} />}
         </>
       )}
     </AnimatePresence>

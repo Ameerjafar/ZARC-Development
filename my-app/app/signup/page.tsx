@@ -83,7 +83,7 @@ export default function SignupPage() {
                industry,
             }),
          });
-
+         localStorage.setItem("token", data.access_token);
          login(data.access_token, data.user);
       } catch (err: any) {
          setError(err.message || "Failed to create account. Please try again.");
