@@ -14,7 +14,7 @@ engine = create_engine(
     connect_args={
         "ssl": {
             "ssl-mode": "REQUIRED",
-            "ca": "/opt/render/project/src/backend/ca.pem"
+            # "ca": "/opt/render/project/src/backend/ca.pem"
         }
     } if "mysql" in DATABASE_URL.lower() else {
         "check_same_thread": False  # Local SQLite fallback
