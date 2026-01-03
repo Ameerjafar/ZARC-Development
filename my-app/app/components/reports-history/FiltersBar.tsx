@@ -1,4 +1,4 @@
-import { Search, Grid, List, ChevronDown, Folder, FileText, Filter } from "lucide-react";
+import { Search, Grid, List, ChevronDown, Folder, FileText, Filter, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface FiltersBarProps {
@@ -30,10 +30,30 @@ export const FiltersBar = ({
     setViewMode,
     dropdownRef,
 }: FiltersBarProps) => {
+
+    // New Helper: Handle "Back to Folders" logic
+    const handleBackToFolders = () => {
+        setSelectedIndustry("all"); // Reset filter
+        setIsGroupedView(true);     // Go back to grid
+    };
+
     return (
         <div className="flex flex-col md:flex-row items-center gap-4">
 
-            {/* 1. Search Input (Expands to fill space) */}
+            {/* 0. NEW: Back to Folders Button (Only visible if inside a folder) */}
+            {!isGroupedView && selectedIndustry !== "all" && (
+                <button
+                    onClick={handleBackToFolders}
+                    className="flex items-center gap-2 pr-4 border-r border-gray-200 text-sm font-bold text-gray-500 hover:text-orange-600 transition-colors"
+                >
+                    <div className="p-1.5 rounded-lg bg-gray-100 group-hover:bg-orange-100">
+                        <ArrowLeft size={16} />
+                    </div>
+                    <span className="hidden md:inline">Folders</span>
+                </button>
+            )}
+
+            {/* 1. Search Input */}
             <div className="relative w-full md:flex-1 group">
                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-orange-500 transition-colors">
                     <Search size={18} />
@@ -47,7 +67,7 @@ export const FiltersBar = ({
                 />
             </div>
 
-            {/* 2. Industry Dropdown (The requested component) */}
+            {/* 2. Industry Dropdown */}
             <div className="relative w-full md:w-48" ref={dropdownRef}>
                 <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -77,6 +97,7 @@ export const FiltersBar = ({
                                     onClick={() => {
                                         setSelectedIndustry(industry);
                                         setIsDropdownOpen(false);
+                                        // Note: We don't force View switch here, allowing user to filter while in grid/list
                                         if (isGroupedView) setIsGroupedView(false);
                                     }}
                                     className={`w-full text-left px-4 py-2.5 text-xs font-medium transition-colors flex items-center justify-between ${selectedIndustry === industry
@@ -95,13 +116,17 @@ export const FiltersBar = ({
 
             <div className="w-px h-8 bg-gray-200 hidden md:block mx-1" />
 
-            {/* 3. View Toggles (Files/Folders + Grid/List) */}
+            {/* 3. View Toggles */}
             <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
 
                 {/* Files / Folders Toggle */}
                 <div className="flex items-center p-1 bg-gray-100 rounded-lg border border-gray-200">
                     <button
-                        onClick={() => setIsGroupedView(false)}
+                        onClick={() => {
+                            setIsGroupedView(false);
+                            // Optional: if they click "Files", maybe we stay in current filter? 
+                            // Or reset? Usually staying is better UX.
+                        }}
                         className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${!isGroupedView
                                 ? "bg-white text-gray-900 shadow-sm"
                                 : "text-gray-500 hover:text-gray-700"
@@ -111,7 +136,10 @@ export const FiltersBar = ({
                         <span className="hidden sm:inline">Files</span>
                     </button>
                     <button
-                        onClick={() => setIsGroupedView(true)}
+                        onClick={() => {
+                            setIsGroupedView(true);
+                            setSelectedIndustry("all"); // Reset filter when going to root folders
+                        }}
                         className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${isGroupedView
                                 ? "bg-white text-gray-900 shadow-sm"
                                 : "text-gray-500 hover:text-gray-700"

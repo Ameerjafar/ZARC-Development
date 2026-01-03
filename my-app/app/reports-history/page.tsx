@@ -7,8 +7,6 @@ import CreateReportModal from '../components/ReportModal';
 import { MOCK_REPORTS } from "../data/reports";
 import { Report } from "../types/reporting";
 import { generateWordDocument, downloadFile } from "../lib/generateWord";
-
-// Modular Components
 import { HistoryHeader } from "../components/reports-history/HistoryHeader";
 import { FiltersBar } from "../components/reports-history/FiltersBar";
 import { FolderCard } from "../components/reports-history/FolderCard";
