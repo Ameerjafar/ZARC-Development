@@ -52,7 +52,6 @@ const CustomIndustryDropdown = ({ value, onChange }: { value: string, onChange: 
    const dropdownRef = useRef<HTMLDivElement>(null);
 
    const options = ["SaaS", "Finance", "Healthcare", "E-commerce", "Others"];
-   const router = useRouter();
    useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
          if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -130,7 +129,7 @@ export default function SignupPage() {
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
    const [error, setError] = useState("");
-   // const { login } = useAuth();
+   const router = useRouter();
 
    const handleSignup = async (e: React.FormEvent) => {
       e.preventDefault();
