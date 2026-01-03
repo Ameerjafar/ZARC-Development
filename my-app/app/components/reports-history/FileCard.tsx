@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { FileText, Download, Clock, MoreVertical, Loader2, Sparkles } from "lucide-react";
-import { Report } from "../types/reporting";
+import { FileText, Download, MoreVertical, Loader2, Sparkles } from "lucide-react";
+import { Report } from "../../types/reporting";
 
 interface FileCardProps {
     report: Report;
