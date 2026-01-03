@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import CreateReportModal from '../components/ReportModal';
 import { MOCK_REPORTS } from "../data/reports";
@@ -58,19 +57,9 @@ export default function ReportsHistoryPage() {
       return a.title.localeCompare(b.title);
     });
 
-  const handleCardClick = (id: string) => {
-    router.push(`/report-view/${id}`);
-  };
-
-  const handleFolderClick = (industry: string) => {
-    setSelectedIndustry(industry);
-    setIsGroupedView(false);
-  };
-
   const handleDownload = async (e: React.MouseEvent, report: Report) => {
-    e.stopPropagation(); // Prevent card click navigation
+    e.stopPropagation();
     setDownloadingId(report.id);
-
     try {
       const blob = await generateWordDocument({
         id: report.id,
@@ -78,57 +67,50 @@ export default function ReportsHistoryPage() {
         industry: report.industry,
         createdAt: report.createdAt,
         sections: [
-          {
-            title: "Executive Summary",
-            content: `This is the ${report.title} intelligence dossier for the ${report.industry} industry.`,
-          },
-          {
-            title: "Key Findings",
-            content: "Detailed insights and analysis from the report generation process.",
-          },
+          { title: "Executive Summary", content: `Analysis for ${report.title}...` },
         ],
       });
-
       downloadFile(blob, `${report.title}.docx`);
     } catch (error) {
-      console.error("Error generating document:", error);
-      alert("Failed to download report. Please try again.");
+      console.error(error);
     } finally {
       setDownloadingId(null);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-slate-900 font-sans selection:bg-orange-100 selection:text-orange-900 relative overflow-hidden">
+    <div className="min-h-screen bg-[#FDFDFD] text-slate-900 font-sans relative">
 
-      {/* Background Gradient */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[#FAFAFA]"></div>
-        <div className="absolute top-[-10%] inset-x-0 h-[800px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-100/60 via-orange-50/30 to-transparent blur-3xl"></div>
-        <div className="absolute top-0 right-0 w-[50%] h-full bg-gradient-to-l from-orange-50/40 to-transparent"></div>
-        <div className="absolute top-0 left-0 w-[50%] h-full bg-gradient-to-r from-orange-50/40 to-transparent"></div>
+      {/* Enhanced Background Gradient */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-0 inset-x-0 h-[600px] bg-gradient-to-b from-orange-50/60 to-transparent opacity-70" />
+        <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-orange-100/40 rounded-full blur-[100px]" />
+        <div className="absolute top-[20%] left-[-10%] w-[500px] h-[500px] bg-blue-50/40 rounded-full blur-[100px]" />
       </div>
 
       <main className="max-w-7xl mx-auto px-6 py-12 relative z-10">
 
-        <HistoryHeader onCreateNew={() => setIsCreateModalOpen(true)} />
+        <div className="mb-10">
+          <HistoryHeader onCreateNew={() => setIsCreateModalOpen(true)} />
+        </div>
 
-        <FiltersBar
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          isGroupedView={isGroupedView}
-          setIsGroupedView={setIsGroupedView}
-          selectedIndustry={selectedIndustry}
-          setSelectedIndustry={setSelectedIndustry}
-          industries={industries}
-          isDropdownOpen={isDropdownOpen}
-          setIsDropdownOpen={setIsDropdownOpen}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-          dropdownRef={dropdownRef}
-        />
+        <div className="sticky top-4 z-40 bg-[#FDFDFD]/80 backdrop-blur-xl p-4 rounded-2xl border border-gray-100 shadow-sm mb-8">
+          <FiltersBar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            isGroupedView={isGroupedView}
+            setIsGroupedView={setIsGroupedView}
+            selectedIndustry={selectedIndustry}
+            setSelectedIndustry={setSelectedIndustry}
+            industries={industries}
+            isDropdownOpen={isDropdownOpen}
+            setIsDropdownOpen={setIsDropdownOpen}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+            dropdownRef={dropdownRef}
+          />
+        </div>
 
-        {/* Content */}
         <AnimatePresence mode="wait">
           {isGroupedView ? (
             <motion.div
@@ -136,14 +118,17 @@ export default function ReportsHistoryPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
             >
               {Object.keys(industryCounts).map((industry) => (
                 <FolderCard
                   key={industry}
                   industry={industry}
                   count={industryCounts[industry]}
-                  onClick={() => handleFolderClick(industry)}
+                  onClick={() => {
+                    setSelectedIndustry(industry);
+                    setIsGroupedView(false);
+                  }}
                 />
               ))}
             </motion.div>
@@ -166,7 +151,7 @@ export default function ReportsHistoryPage() {
                     viewMode={viewMode}
                     downloadingId={downloadingId}
                     onDownload={(e) => handleDownload(e, report)}
-                    onClick={() => handleCardClick(report.id)}
+                    onClick={() => router.push(`/report-view/${report.id}`)}
                   />
                 ))}
               </motion.div>

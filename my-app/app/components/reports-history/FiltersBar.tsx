@@ -1,22 +1,19 @@
-"use client";
-
-import React from "react";
+import { Search, Grid, List, ChevronDown, Folder, FileText, Filter } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, FileText, Folder, Grid, List, ChevronDown, Check } from "lucide-react";
 
 interface FiltersBarProps {
     searchQuery: string;
-    setSearchQuery: (query: string) => void;
+    setSearchQuery: (q: string) => void;
     isGroupedView: boolean;
-    setIsGroupedView: (val: boolean) => void;
+    setIsGroupedView: (v: boolean) => void;
     selectedIndustry: string;
-    setSelectedIndustry: (val: string) => void;
+    setSelectedIndustry: (i: string) => void;
     industries: string[];
     isDropdownOpen: boolean;
-    setIsDropdownOpen: (val: boolean) => void;
+    setIsDropdownOpen: (v: boolean) => void;
     viewMode: "grid" | "list";
-    setViewMode: (mode: "grid" | "list") => void;
-    dropdownRef: React.RefObject<HTMLDivElement | null>;
+    setViewMode: (m: "grid" | "list") => void;
+    dropdownRef: React.RefObject<HTMLDivElement>;
 }
 
 export const FiltersBar = ({
@@ -34,111 +31,121 @@ export const FiltersBar = ({
     dropdownRef,
 }: FiltersBarProps) => {
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.5 }}
-            className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-sm border border-slate-200 p-2 mb-10 flex flex-col md:flex-row gap-3 sticky top-6 z-40"
-        >
-            <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+        <div className="flex flex-col md:flex-row items-center gap-4">
+
+            {/* 1. Search Input (Expands to fill space) */}
+            <div className="relative w-full md:flex-1 group">
+                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-orange-500 transition-colors">
+                    <Search size={18} />
+                </div>
                 <input
                     type="text"
                     placeholder="Search reports..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-transparent border-none text-slate-900 placeholder:text-slate-400 focus:ring-0 outline-none font-medium"
+                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 focus:outline-none focus:border-orange-300 focus:ring-4 focus:ring-orange-50/50 transition-all placeholder:text-gray-400 shadow-sm"
                 />
             </div>
 
-            <div className="h-px md:h-auto md:w-px bg-slate-200 mx-2" />
+            {/* 2. Industry Dropdown (The requested component) */}
+            <div className="relative w-full md:w-48" ref={dropdownRef}>
+                <button
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="w-full flex items-center justify-between px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:border-gray-300 focus:outline-none focus:border-orange-300 focus:ring-4 focus:ring-orange-50/50 transition-all shadow-sm"
+                >
+                    <div className="flex items-center gap-2 truncate">
+                        <Filter size={16} className="text-gray-400" />
+                        <span className="capitalize">
+                            {selectedIndustry === "all" ? "All Industries" : selectedIndustry}
+                        </span>
+                    </div>
+                    <ChevronDown size={16} className={`text-gray-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
 
-            <div className="flex items-center gap-3 px-2">
-                {/* Grouping Toggle */}
-                <div className="flex bg-slate-100/50 rounded-xl p-1 border border-slate-200">
+                <AnimatePresence>
+                    {isDropdownOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                            transition={{ duration: 0.15 }}
+                            className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50 overflow-hidden max-h-60 overflow-y-auto"
+                        >
+                            {industries.map((industry) => (
+                                <button
+                                    key={industry}
+                                    onClick={() => {
+                                        setSelectedIndustry(industry);
+                                        setIsDropdownOpen(false);
+                                        if (isGroupedView) setIsGroupedView(false);
+                                    }}
+                                    className={`w-full text-left px-4 py-2.5 text-xs font-medium transition-colors flex items-center justify-between ${selectedIndustry === industry
+                                            ? "bg-orange-50 text-orange-700"
+                                            : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                                        }`}
+                                >
+                                    <span className="capitalize">{industry === "all" ? "All Industries" : industry}</span>
+                                    {selectedIndustry === industry && <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />}
+                                </button>
+                            ))}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            <div className="w-px h-8 bg-gray-200 hidden md:block mx-1" />
+
+            {/* 3. View Toggles (Files/Folders + Grid/List) */}
+            <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+
+                {/* Files / Folders Toggle */}
+                <div className="flex items-center p-1 bg-gray-100 rounded-lg border border-gray-200">
                     <button
                         onClick={() => setIsGroupedView(false)}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all ${!isGroupedView ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${!isGroupedView
+                                ? "bg-white text-gray-900 shadow-sm"
+                                : "text-gray-500 hover:text-gray-700"
+                            }`}
                     >
-                        <FileText className="w-3.5 h-3.5" />
-                        Files
+                        <FileText size={14} />
+                        <span className="hidden sm:inline">Files</span>
                     </button>
                     <button
                         onClick={() => setIsGroupedView(true)}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all ${isGroupedView ? "bg-white text-orange-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${isGroupedView
+                                ? "bg-white text-gray-900 shadow-sm"
+                                : "text-gray-500 hover:text-gray-700"
+                            }`}
                     >
-                        <Folder className="w-3.5 h-3.5" />
-                        Folders
+                        <Folder size={14} />
+                        <span className="hidden sm:inline">Folders</span>
                     </button>
                 </div>
 
+                {/* Grid / List Toggle (Hidden in Folder View) */}
                 {!isGroupedView && (
-                    <>
-                        <div className="w-px h-8 bg-slate-200 mx-1"></div>
-                        <div className="relative" ref={dropdownRef}>
-                            <button
-                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className={`
-                  pl-4 pr-10 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm flex items-center border
-                  ${isDropdownOpen || selectedIndustry !== 'all'
-                                        ? "bg-orange-50 border-orange-200 text-orange-700"
-                                        : "bg-white border-slate-200 text-slate-700 hover:border-orange-200"
-                                    }
-                `}
-                            >
-                                {selectedIndustry === "all" ? "All Industries" : selectedIndustry}
-                                <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-transform ${isDropdownOpen ? "rotate-180 text-orange-500" : "text-slate-400"}`} />
-                            </button>
-
-                            <AnimatePresence>
-                                {isDropdownOpen && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                                        className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-2xl border border-slate-100 overflow-hidden z-20 p-1"
-                                    >
-                                        {industries.map((ind) => (
-                                            <button
-                                                key={ind}
-                                                onClick={() => {
-                                                    setSelectedIndustry(ind);
-                                                    setIsDropdownOpen(false);
-                                                }}
-                                                className={`
-                          w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold flex items-center justify-between transition-colors
-                          ${selectedIndustry === ind
-                                                        ? "bg-orange-50 text-orange-700"
-                                                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                                                    }
-                        `}
-                                            >
-                                                {ind === "all" ? "All Industries" : ind}
-                                                {selectedIndustry === ind && <Check className="w-3.5 h-3.5 text-orange-500" />}
-                                            </button>
-                                        ))}
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
-
-                        <div className="flex bg-slate-100/50 rounded-xl p-1 border border-slate-200">
-                            <button
-                                onClick={() => setViewMode("grid")}
-                                className={`p-2 rounded-lg transition-all ${viewMode === "grid" ? "bg-white text-slate-900 shadow-sm" : "text-slate-400 hover:text-slate-600"}`}
-                            >
-                                <Grid className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={() => setViewMode("list")}
-                                className={`p-2 rounded-lg transition-all ${viewMode === "list" ? "bg-white text-slate-900 shadow-sm" : "text-slate-400 hover:text-slate-600"}`}
-                            >
-                                <List className="w-4 h-4" />
-                            </button>
-                        </div>
-                    </>
+                    <div className="flex items-center p-1 bg-gray-100 rounded-lg border border-gray-200">
+                        <button
+                            onClick={() => setViewMode("grid")}
+                            className={`p-1.5 rounded-md transition-all ${viewMode === "grid"
+                                    ? "bg-white text-orange-600 shadow-sm"
+                                    : "text-gray-400 hover:text-gray-600"
+                                }`}
+                        >
+                            <Grid size={16} />
+                        </button>
+                        <button
+                            onClick={() => setViewMode("list")}
+                            className={`p-1.5 rounded-md transition-all ${viewMode === "list"
+                                    ? "bg-white text-orange-600 shadow-sm"
+                                    : "text-gray-400 hover:text-gray-600"
+                                }`}
+                        >
+                            <List size={16} />
+                        </button>
+                    </div>
                 )}
             </div>
-        </motion.div>
+        </div>
     );
 };
