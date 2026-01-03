@@ -10,7 +10,7 @@ export default function ReportPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-100 text-gray-900 selection:bg-orange-200">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-100 text-gray-900">
       
       {/* Background Decor */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
