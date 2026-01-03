@@ -36,7 +36,7 @@ const navLinks = [
   { label: "Pricing", href: "#" }, // Added for completeness
 ];
 
-export const Navbar = ({ onOpenAuth }: NavbarProps) => {
+export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeHover, setActiveHover] = useState<number | null>(null);
@@ -76,8 +76,8 @@ export const Navbar = ({ onOpenAuth }: NavbarProps) => {
             }
           `}
           style={{
-             maxWidth: "95%",
-             width: searchOpen ? "600px" : "fit-content"
+            maxWidth: "95%",
+            width: searchOpen ? "600px" : "fit-content"
           }}
         >
           {/* Logo Section */}
@@ -180,13 +180,13 @@ export const Navbar = ({ onOpenAuth }: NavbarProps) => {
               Log in
             </button>
             <button
-              onClick={() => onOpenAuth("signup")}
+              onClick={() => router.push('/signup')}
               className="group relative flex items-center gap-2 px-5 py-2.5 bg-slate-900 text-white rounded-full text-sm font-semibold hover:bg-slate-800 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-slate-900/20"
             >
               <span className="relative z-10">Get Started</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </button>
-            
+
             {/* Mobile Menu Trigger */}
             <button
               className="md:hidden w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-900 ml-1 hover:bg-slate-100 transition-colors"
@@ -252,7 +252,7 @@ export const Navbar = ({ onOpenAuth }: NavbarProps) => {
                 Log In
               </button>
               <button
-                onClick={() => { setMobileMenuOpen(false); onOpenAuth("signup"); }}
+                onClick={() => { setMobileMenuOpen(false); router.push('/signup'); }}
                 className="w-full py-4 rounded-2xl bg-slate-900 text-white font-bold text-lg flex items-center justify-center gap-2 hover:bg-slate-800 transition-colors shadow-xl shadow-slate-900/20"
               >
                 Get Started
