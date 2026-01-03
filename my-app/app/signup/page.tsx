@@ -1,19 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-   Zap, Mail, Lock, ArrowRight, Loader2, User, Building2, Briefcase, AlertCircle
+   Zap, Mail, Lock, ArrowRight, Loader2, User, Building2, Briefcase, AlertCircle, ChevronDown, Check
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
-import { useAuth } from "../context/AuthContext";
+// import { useAuth } from "../context/AuthContext";
 import { apiFetch } from "../lib/api";
+import { useRouter } from 'next/navigation'
 
 const DashboardPreview = () => (
    <div className="hidden lg:flex lg:w-[50%] fixed right-0 top-0 h-screen bg-[#0F172A] items-center justify-center overflow-hidden z-0">
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 z-10"></div>
-
-      <div className="absolute top-[-20%] right-[-10%] w-[70vw] h-[70vw] max-w-[900px] max-h-[900px] bg-teal-500/10 rounded-full blur-[120px] mix-blend-screen animate-pulse duration-[10000ms]"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-900/20 to-slate-900/80 z-10 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 z-0"></div>
+      <div className="absolute top-[-20%] right-[-10%] w-[70vw] h-[70vw] max-w-[900px] max-h-[900px] bg-orange-500/10 rounded-full blur-[120px] mix-blend-screen animate-pulse duration-[10000ms]"></div>
       <div className="absolute bottom-[-20%] left-[-20%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] bg-amber-600/10 rounded-full blur-[100px] mix-blend-screen"></div>
 
       <motion.div
@@ -45,11 +46,81 @@ const GoogleIcon = () => (
    </svg>
 );
 
-const GithubIcon = () => (
-   <svg viewBox="0 0 24 24" className="w-6 h-6 fill-[#181717]">
-      <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.419-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
-   </svg>
-);
+// --- CUSTOM DROPDOWN COMPONENT ---
+const CustomIndustryDropdown = ({ value, onChange }: { value: string, onChange: (val: string) => void }) => {
+   const [isOpen, setIsOpen] = useState(false);
+   const dropdownRef = useRef<HTMLDivElement>(null);
+
+   const options = ["SaaS", "Finance", "Healthcare", "E-commerce", "Others"];
+   const router = useRouter();
+   useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+         if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+            setIsOpen(false);
+         }
+      };
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+   }, []);
+
+   return (
+      <div className="relative group" ref={dropdownRef}>
+         <Briefcase className={`absolute left-3.5 top-3.5 w-5 h-5 transition-colors z-10 ${isOpen || value ? 'text-orange-500' : 'text-slate-400 group-focus-within:text-orange-500'}`} />
+         <ChevronDown className={`absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180 text-orange-500' : ''}`} />
+
+         {/* Trigger Button (Looks like Input) */}
+         <button
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            className={`
+               w-full text-left bg-white border border-slate-200 
+               rounded-xl pl-11 pr-10 py-3 text-sm font-bold outline-none 
+               transition-all shadow-sm hover:border-orange-300
+               ${isOpen ? 'border-orange-500 ring-4 ring-orange-500/10' : ''}
+               ${value ? "text-slate-900" : "text-slate-400"}
+            `}
+         >
+            {value || "Select an industry..."}
+         </button>
+
+         {/* Animated Dropdown Menu */}
+         <AnimatePresence>
+            {isOpen && (
+               <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl shadow-orange-500/10 border border-orange-100 overflow-hidden"
+               >
+                  <div className="bg-gradient-to-br from-orange-50/50 via-white to-orange-100/50 p-1.5 space-y-0.5">
+                     {options.map((option) => (
+                        <button
+                           key={option}
+                           type="button"
+                           onClick={() => {
+                              onChange(option);
+                              setIsOpen(false);
+                           }}
+                           className={`
+                              w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold flex items-center justify-between
+                              transition-all duration-150
+                              ${value === option
+                                 ? "bg-orange-500 text-white shadow-md shadow-orange-500/20"
+                                 : "text-slate-600 hover:bg-orange-50 hover:text-orange-700"}
+                           `}
+                        >
+                           {option}
+                           {value === option && <Check className="w-4 h-4" />}
+                        </button>
+                     ))}
+                  </div>
+               </motion.div>
+            )}
+         </AnimatePresence>
+      </div>
+   );
+};
 
 export default function SignupPage() {
    const [isLoading, setIsLoading] = useState(false);
@@ -59,7 +130,7 @@ export default function SignupPage() {
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
    const [error, setError] = useState("");
-   const { login } = useAuth();
+   // const { login } = useAuth();
 
    const handleSignup = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -75,7 +146,7 @@ export default function SignupPage() {
                email,
                username,
                password,
-               fullName, // Now using single fullName state
+               fullName,
                company,
                industry: industry || "",
             }),
@@ -86,24 +157,17 @@ export default function SignupPage() {
                description: "Redirecting you to the dashboard...",
                duration: 3000,
             });
-
             localStorage.setItem("token", data.access_token);
-            setTimeout(() => {
-               login(data.access_token, data.user);
-            }, 1000);
+            router.push('/report')
          }
       } catch (err: any) {
          console.error("Signup Error:", err);
          let errorMessage = "Failed to create account. Please try again.";
 
-         // Handle Pydantic Validation Errors (Array)
          if (err?.detail && Array.isArray(err.detail)) {
             const firstError = err.detail[0];
-            if (firstError?.msg) {
-               errorMessage = firstError.msg;
-            }
+            if (firstError?.msg) errorMessage = firstError.msg;
          }
-         // Handle Standard Errors (String)
          else if (typeof err?.detail === 'string') {
             errorMessage = err.detail;
          }
@@ -125,7 +189,7 @@ export default function SignupPage() {
    };
 
    return (
-      <div className="min-h-screen w-full flex font-sans text-slate-900 bg-white selection:bg-orange-100 selection:text-orange-900">
+      <div className="min-h-screen w-full flex font-sans text-slate-900 bg-gradient-to-br from-orange-50 via-white to-orange-100 selection:bg-orange-200 selection:text-orange-900">
          <Toaster position="top-center" richColors />
 
          {/* LEFT SIDE: FORM CONTAINER */}
@@ -133,8 +197,8 @@ export default function SignupPage() {
 
             {/* Subtle Background Decor */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-               <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-100/40 rounded-full blur-[80px]"></div>
-               <div className="absolute bottom-[10%] right-[10%] w-[300px] h-[300px] bg-blue-50/50 rounded-full blur-[60px]"></div>
+               <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-200/20 rounded-full blur-[80px]"></div>
+               <div className="absolute bottom-[10%] right-[10%] w-[300px] h-[300px] bg-white/60 rounded-full blur-[60px]"></div>
             </div>
 
             <div className="w-full max-w-[440px] relative z-10">
@@ -146,22 +210,15 @@ export default function SignupPage() {
                      Create your workspace to start generating reports.
                   </p>
                </div>
-
-               {/* Social Icons */}
-               <div className="flex justify-center lg:justify-start gap-5 mb-10">
-                  <button className="w-16 h-16 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:scale-105 hover:border-orange-200 hover:shadow-xl hover:shadow-orange-500/10 transition-all duration-300 group">
+               <div className="flex justify-center gap-5 mb-10">
+                  <button className="w-16 h-16 rounded-full bg-white border border-orange-100 flex items-center justify-center hover:scale-105 hover:border-orange-300 hover:shadow-xl hover:shadow-orange-500/10 transition-all duration-300 group">
                      <GoogleIcon />
                   </button>
-                  <button className="w-16 h-16 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:scale-105 hover:border-slate-400 hover:shadow-xl transition-all duration-300 group">
-                     <GithubIcon />
-                  </button>
                </div>
-
-               {/* Divider */}
                <div className="relative flex items-center mb-8">
-                  <div className="flex-grow border-t border-slate-200"></div>
-                  <span className="flex-shrink-0 mx-4 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest">Or continue with email</span>
-                  <div className="flex-grow border-t border-slate-200"></div>
+                  <div className="flex-grow border-t border-orange-200"></div>
+                  <span className="flex-shrink-0 mx-4 text-[11px] font-extrabold text-orange-400 uppercase tracking-widest">Or continue with email</span>
+                  <div className="flex-grow border-t border-orange-200"></div>
                </div>
 
                {/* Form */}
@@ -171,14 +228,14 @@ export default function SignupPage() {
                      <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2"
+                        className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 shadow-sm"
                      >
                         <AlertCircle className="w-4 h-4 flex-shrink-0" />
                         {error}
                      </motion.div>
                   )}
 
-                  {/* Full Name (REQUIRED) */}
+                  {/* Full Name */}
                   <div className="space-y-1.5">
                      <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">
                         Full Name <span className="text-orange-600">*</span>
@@ -191,12 +248,12 @@ export default function SignupPage() {
                            value={fullName}
                            onChange={(e) => setFullName(e.target.value)}
                            required
-                           className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-slate-300"
+                           className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-orange-300"
                         />
                      </div>
                   </div>
 
-                  {/* Company Name (REQUIRED) */}
+                  {/* Company Name */}
                   <div className="space-y-1.5">
                      <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">
                         Company Name <span className="text-orange-600">*</span>
@@ -209,29 +266,20 @@ export default function SignupPage() {
                            value={company}
                            onChange={(e) => setCompany(e.target.value)}
                            required
-                           className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-slate-300"
+                           className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-orange-300"
                         />
                      </div>
                   </div>
 
-                  {/* Industry (Optional) */}
+                  {/* Industry (CUSTOM GRADIENT DROPDOWN) */}
                   <div className="space-y-1.5">
                      <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">
                         Industry <span className="text-slate-400 font-medium lowercase tracking-normal">(optional)</span>
                      </label>
-                     <div className="relative group">
-                        <Briefcase className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
-                        <input
-                           type="text"
-                           placeholder="e.g. SaaS / Finance"
-                           value={industry}
-                           onChange={(e) => setIndustry(e.target.value)}
-                           className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-slate-300"
-                        />
-                     </div>
+                     <CustomIndustryDropdown value={industry} onChange={setIndustry} />
                   </div>
 
-                  {/* Work Email (REQUIRED) */}
+                  {/* Work Email */}
                   <div className="space-y-1.5">
                      <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">
                         Work Email <span className="text-orange-600">*</span>
@@ -244,12 +292,12 @@ export default function SignupPage() {
                            value={email}
                            onChange={(e) => setEmail(e.target.value)}
                            required
-                           className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-slate-300"
+                           className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-orange-300"
                         />
                      </div>
                   </div>
 
-                  {/* Password (REQUIRED) */}
+                  {/* Password */}
                   <div className="space-y-1.5">
                      <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">
                         Password <span className="text-orange-600">*</span>
@@ -262,7 +310,7 @@ export default function SignupPage() {
                            value={password}
                            onChange={(e) => setPassword(e.target.value)}
                            required
-                           className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-slate-300"
+                           className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-orange-300"
                         />
                      </div>
                   </div>

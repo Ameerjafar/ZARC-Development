@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -52,6 +52,16 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
     [searchQuery]
   );
 
+  // Auto-select all modules when entering Step 1 (Choose Modules)
+  useEffect(() => {
+    if (currentStep === 1) {
+      // Only auto-select if nothing is selected yet (initial entry)
+      if (selectedModules.length === 0) {
+        setSelectedModules(ALL_MODULES);
+      }
+    }
+  }, [currentStep]);
+
   const toggleModule = (mod: Option) => {
     setSelectedModules((prev) => {
       const exists = prev.find((m) => m.id === mod.id);
@@ -60,12 +70,12 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
     });
   };
 
-  const toggleAllModules = () => {
-    if (selectedModules.length === filteredModules.length) {
-      setSelectedModules([]);
-    } else {
-      setSelectedModules([...filteredModules]);
-    }
+  const selectAllModules = () => {
+    setSelectedModules([...ALL_MODULES]);
+  };
+
+  const deselectAllModules = () => {
+    setSelectedModules([]);
   };
 
   const startGeneration = async () => {
@@ -85,6 +95,8 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
       status: "completed" as const,
       modules: selectedModules.map(m => m.label)
     };
+
+    // Dynamic import to avoid server-side issues
     const { addReport } = await import("../data/reports");
     addReport(newReport);
 
@@ -148,7 +160,8 @@ export default function CreateReportModal({ isOpen, onClose }: CreateReportModal
                     filteredModules={filteredModules}
                     selectedModules={selectedModules}
                     toggleModule={toggleModule}
-                    toggleAllModules={toggleAllModules}
+                    onSelectAll={selectAllModules}
+                    onDeselectAll={deselectAllModules}
                     onBack={() => setCurrentStep(0)}
                     onGenerate={startGeneration}
                   />
