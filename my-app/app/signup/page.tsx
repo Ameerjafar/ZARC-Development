@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import {
    Zap, Mail, Lock, ArrowRight, Loader2, User, Building2, Briefcase, AlertCircle
 } from "lucide-react";
+import { Toaster, toast } from "sonner";
 import { useAuth } from "../context/AuthContext";
 import { apiFetch } from "../lib/api";
 
@@ -35,7 +36,6 @@ const DashboardPreview = () => (
    </div>
 );
 
-// --- AUTH ICONS ---
 const GoogleIcon = () => (
    <svg viewBox="0 0 24 24" className="w-6 h-6">
       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -67,8 +67,7 @@ export default function SignupPage() {
       setIsLoading(true);
       setError("");
 
-      // Simple username generation from email
-      const username = email.split("@")[0].replace(/[^a-zA-Z0-9_-]/g, "_") + Math.floor(Math.random() * 1000);
+      const username = email.split("@")[0].replace(/[^a-zA-Z0-9_-]/g, "_") + Math.floor(Math.random() * 10000);
 
       try {
          const data = await apiFetch("/api/auth/signup", {
@@ -77,22 +76,59 @@ export default function SignupPage() {
                email,
                username,
                password,
-               first_name: firstName,
-               last_name: lastName,
-               company,
-               industry,
+               first_name: firstName || "", // Send empty string if undefined
+               last_name: lastName || "",
+               company: company || "",
+               industry: industry || "",
             }),
          });
-         localStorage.setItem("token", data.access_token);
-         login(data.access_token, data.user);
+
+         if (data.access_token) {
+            toast.success("Welcome aboard! Your workspace is ready.", {
+               description: "Redirecting you to the dashboard...",
+               duration: 3000,
+            });
+
+            localStorage.setItem("token", data.access_token);
+            setTimeout(() => {
+               login(data.access_token, data.user);
+            }, 1000);
+         }
       } catch (err: any) {
-         setError(err.message || "Failed to create account. Please try again.");
+         console.error("Signup Error:", err);
+         let errorMessage = "Failed to create account. Please try again.";
+
+         // Handle Pydantic Validation Errors (Array)
+         if (err?.detail && Array.isArray(err.detail)) {
+            const firstError = err.detail[0];
+            if (firstError?.msg) {
+               errorMessage = firstError.msg;
+            }
+         }
+         // Handle Standard Errors (String)
+         else if (typeof err?.detail === 'string') {
+            errorMessage = err.detail;
+         }
+         else if (err?.message) {
+            errorMessage = err.message;
+         }
+
+         if (errorMessage.toLowerCase().includes("username")) {
+            errorMessage = "Temporary system conflict. Please try clicking 'Create Workspace' again.";
+         }
+
+         toast.error("Registration Failed", {
+            description: errorMessage,
+         });
+
+         setError(errorMessage);
          setIsLoading(false);
       }
    };
 
    return (
       <div className="min-h-screen w-full flex font-sans text-slate-900 bg-white selection:bg-orange-100 selection:text-orange-900">
+         <Toaster position="top-center" richColors />
 
          {/* LEFT SIDE: FORM CONTAINER */}
          <div className="w-full lg:w-[50%] flex flex-col justify-center items-center px-6 py-12 lg:p-12 relative z-10">
@@ -132,17 +168,24 @@ export default function SignupPage() {
 
                {/* Form */}
                <form onSubmit={handleSignup} className="space-y-5">
+                  {/* Inline Error Display */}
                   {error && (
-                     <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-2xl text-sm font-bold flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4" />
+                     <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2"
+                     >
+                        <AlertCircle className="w-4 h-4 flex-shrink-0" />
                         {error}
-                     </div>
+                     </motion.div>
                   )}
 
-                  {/* Row 1: Personal Info */}
+                  {/* Row 1: Personal Info (Optional) */}
                   <div className="grid grid-cols-2 gap-4">
                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">First Name</label>
+                        <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">
+                           First Name <span className="text-slate-400 font-medium lowercase tracking-normal">(optional)</span>
+                        </label>
                         <div className="relative group">
                            <User className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
                            <input
@@ -150,27 +193,31 @@ export default function SignupPage() {
                               placeholder="Sarah"
                               value={firstName}
                               onChange={(e) => setFirstName(e.target.value)}
-                              required
                               className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-slate-300"
                            />
                         </div>
                      </div>
                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">Last Name</label>
+                        <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">
+                           Last Name <span className="text-slate-400 font-medium lowercase tracking-normal">(optional)</span>
+                        </label>
                         <div className="relative group">
                            <input
                               type="text"
                               placeholder="Chen"
                               value={lastName}
                               onChange={(e) => setLastName(e.target.value)}
-                              required
                               className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-slate-300"
                            />
                         </div>
                      </div>
                   </div>
+
+                  {/* Company Name (Optional) */}
                   <div className="space-y-1.5">
-                     <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">Company Name</label>
+                     <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">
+                        Company Name <span className="text-slate-400 font-medium lowercase tracking-normal">(optional)</span>
+                     </label>
                      <div className="relative group">
                         <Building2 className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
                         <input
@@ -178,31 +225,33 @@ export default function SignupPage() {
                            placeholder="Helix Market Research"
                            value={company}
                            onChange={(e) => setCompany(e.target.value)}
-                           required
                            className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-slate-300"
                         />
                      </div>
                   </div>
 
-                  {/* Industry - Changed to Input Box & Removed Data Focus */}
+                  {/* Industry (Optional) */}
                   <div className="space-y-1.5">
-                     <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">Industry</label>
+                     <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">
+                        Industry <span className="text-slate-400 font-medium lowercase tracking-normal">(optional)</span>
+                     </label>
                      <div className="relative group">
                         <Briefcase className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
-                        {/* Changed from select to input */}
                         <input
                            type="text"
                            placeholder="e.g. SaaS / Finance"
                            value={industry}
                            onChange={(e) => setIndustry(e.target.value)}
-                           required
                            className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-slate-300"
                         />
                      </div>
                   </div>
 
+                  {/* Work Email (REQUIRED) */}
                   <div className="space-y-1.5">
-                     <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">Work Email</label>
+                     <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">
+                        Work Email <span className="text-orange-600">*</span>
+                     </label>
                      <div className="relative group">
                         <Mail className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
                         <input
@@ -216,8 +265,11 @@ export default function SignupPage() {
                      </div>
                   </div>
 
+                  {/* Password (REQUIRED) */}
                   <div className="space-y-1.5">
-                     <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">Password</label>
+                     <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">
+                        Password <span className="text-orange-600">*</span>
+                     </label>
                      <div className="relative group">
                         <Lock className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
                         <input

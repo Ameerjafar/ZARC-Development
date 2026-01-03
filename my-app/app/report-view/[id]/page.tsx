@@ -63,9 +63,6 @@ const MODULE_CONFIG: Record<string, { icon: any; color: string; bg: string; desc
     },
 };
 
-// --- REALISTIC DYNAMIC CONTENT COMPONENT ---
-// This component simulates receiving raw Markdown/HTML from an API
-// and styling it consistently without knowing the exact content structure.
 const DynamicContentRenderer = ({ content }: { content: string }) => {
     return (
         <div className="prose prose-stone max-w-none 
@@ -75,12 +72,6 @@ const DynamicContentRenderer = ({ content }: { content: string }) => {
       prose-li:text-gray-600 prose-li:my-2
       prose-blockquote:border-l-4 prose-blockquote:border-orange-500 prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:bg-gray-50 prose-blockquote:py-4 prose-blockquote:pr-4 prose-blockquote:rounded-r-lg prose-blockquote:not-italic
       prose-strong:text-gray-900 prose-strong:font-bold">
-
-            {/* 
-         In a real app, you would use a library like 'react-markdown' here.
-         For now, we are using dangerouslySetInnerHTML to simulate rendering 
-         rich text content that comes from your backend.
-      */}
             <div dangerouslySetInnerHTML={{ __html: content }} />
         </div>
     );
@@ -93,7 +84,6 @@ export default function ReportViewPage() {
 
     const report = MOCK_REPORTS.find((r) => r.id === id);
 
-    // --- STATE ---
     const [activeSection, setActiveSection] = useState<string>("summary");
     const [sidebarSearch, setSidebarSearch] = useState("");
 
@@ -103,8 +93,7 @@ export default function ReportViewPage() {
         </div>
     );
 
-    // --- 1. Navigation Setup ---
-    const allNavItems = useMemo(() => [
+    const allNavItems = [
         { id: "summary", label: "Executive Summary", icon: LayoutDashboard, category: "Overview" },
         ...(report.modules || []).map(m => ({
             id: m,
@@ -112,7 +101,7 @@ export default function ReportViewPage() {
             icon: MODULE_CONFIG[m]?.icon || FileText,
             category: "Modules"
         }))
-    ], [report]);
+    ];
 
     const filteredNavItems = allNavItems.filter(item =>
         item.label.toLowerCase().includes(sidebarSearch.toLowerCase())
@@ -128,8 +117,6 @@ export default function ReportViewPage() {
         if (currentIndex > 0) setActiveSection(allNavItems[currentIndex - 1].id);
     };
 
-    // --- 2. GENERATE DYNAMIC MOCK CONTENT ---
-    // In a real app, this string would come from your database based on `activeSection`
     const getSectionContent = (section: string) => {
         if (section === "summary") {
             return `
@@ -151,7 +138,6 @@ export default function ReportViewPage() {
       `;
         }
 
-        // Generic content for any other module
         return `
       <p>This section provides a detailed breakdown of <strong>${section}</strong>. We have synthesized data from multiple touchpoints to provide a granular view of emerging patterns and anomalies within the ${report.industry} sector.</p>
       
@@ -179,7 +165,6 @@ export default function ReportViewPage() {
                     <div className="h-6 w-px bg-gray-200" />
                     <div>
                         <h1 className="text-sm font-bold text-gray-900 leading-none">{report.title}</h1>
-                        {/* <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wide">Read Mode</span> */}
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -194,7 +179,7 @@ export default function ReportViewPage() {
             {/* --- Main Layout --- */}
             <div className="flex-1 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 h-[calc(100vh-64px)]">
 
-                {/* --- LEFT SIDEBAR (Unchanged) --- */}
+                {/* --- LEFT SIDEBAR --- */}
                 <aside className="lg:col-span-3 flex flex-col h-full bg-white/50 rounded-2xl border border-gray-100/50 backdrop-blur-sm overflow-hidden shadow-sm">
                     <div className="p-4 border-b border-gray-100 bg-white/50 shrink-0">
                         <div className="flex items-center gap-2 mb-2">
@@ -247,87 +232,90 @@ export default function ReportViewPage() {
                     </div>
                 </aside>
 
-                {/* --- RIGHT CONTENT AREA (Generic Rendering) --- */}
+                {/* --- RIGHT CONTENT AREA --- */}
                 <main className="lg:col-span-9 flex flex-col h-full overflow-hidden">
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={activeSection}
-                            initial={{ opacity: 0, x: 10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -10 }}
-                            transition={{ duration: 0.2 }}
-                            className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-orange-500/5 flex-1 flex flex-col h-full overflow-hidden relative"
-                        >
+                    {/* WRAPPER - Static, doesn't animate */}
+                    <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-orange-500/5 flex-1 flex flex-col h-full overflow-hidden relative">
 
-                            {/* 1. Universal Header (Changes based on config) */}
-                            {(() => {
-                                const config = activeSection === "summary"
-                                    ? { icon: LayoutDashboard, color: "text-orange-600", bg: "bg-orange-50", description: "High-level overview of findings." }
-                                    : MODULE_CONFIG[activeSection] || { icon: FileText, color: "text-gray-600", bg: "bg-gray-50", description: "Detailed Analysis" };
-                                const Icon = config.icon;
+                        {/* ANIMATED CONTENT - Only this part changes */}
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={activeSection}
+                                initial={{ opacity: 0, x: 10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -10 }}
+                                transition={{ duration: 0.2 }}
+                                className="flex-1 flex flex-col overflow-hidden"
+                            >
+                                {/* Header */}
+                                {(() => {
+                                    const config = activeSection === "summary"
+                                        ? { icon: LayoutDashboard, color: "text-orange-600", bg: "bg-orange-50", description: "High-level overview of findings." }
+                                        : MODULE_CONFIG[activeSection] || { icon: FileText, color: "text-gray-600", bg: "bg-gray-50", description: "Detailed Analysis" };
+                                    const Icon = config.icon;
 
-                                return (
-                                    <div className="px-8 py-8 border-b border-gray-100/50 flex-shrink-0 bg-white">
-                                        <div className="flex justify-between items-start">
-                                            <div className="flex items-start gap-4 max-w-md">
-                                                <div className={`w-12 h-12 rounded-2xl shadow-sm flex items-center justify-center flex-shrink-0 ${activeSection === "summary" ? "bg-orange-50" : "bg-gray-50"}`}>
-                                                    <Icon className={`w-6 h-6 ${config.color}`} />
+                                    return (
+                                        <div className="px-8 py-8 border-b border-gray-100/50 flex-shrink-0 bg-white">
+                                            <div className="flex justify-between items-start">
+                                                <div className="flex items-start gap-4 max-w-md">
+                                                    <div className={`w-12 h-12 rounded-2xl shadow-sm flex items-center justify-center flex-shrink-0 ${activeSection === "summary" ? "bg-orange-50" : "bg-gray-50"}`}>
+                                                        <Icon className={`w-6 h-6 ${config.color}`} />
+                                                    </div>
+                                                    <div className="mt-1">
+                                                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">
+                                                            {activeSection === "summary" ? "Report Context" : "Module Context"}
+                                                        </h4>
+                                                        <p className="text-sm text-gray-500 leading-snug">{config.description}</p>
+                                                    </div>
                                                 </div>
-                                                <div className="mt-1">
-                                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">
-                                                        {activeSection === "summary" ? "Report Context" : "Module Context"}
-                                                    </h4>
-                                                    <p className="text-sm text-gray-500 leading-snug">{config.description}</p>
+                                                <div className="flex flex-col items-end text-right">
+                                                    <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-2 shadow-sm ${activeSection === "summary" ? "bg-gray-900 text-white" : "bg-white border border-gray-200 text-gray-600"}`}>
+                                                        {activeSection === "summary" ? "Executive Summary" : `Section ${currentIndex + 1}`}
+                                                    </div>
+                                                    <h2 className="text-2xl font-black text-gray-900 leading-tight">
+                                                        {activeSection === "summary" ? "Strategic Overview" : activeSection}
+                                                    </h2>
                                                 </div>
-                                            </div>
-                                            <div className="flex flex-col items-end text-right">
-                                                <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-2 shadow-sm ${activeSection === "summary" ? "bg-gray-900 text-white" : "bg-white border border-gray-200 text-gray-600"}`}>
-                                                    {activeSection === "summary" ? "Executive Summary" : `Section ${currentIndex + 1}`}
-                                                </div>
-                                                <h2 className="text-2xl font-black text-gray-900 leading-tight">
-                                                    {activeSection === "summary" ? "Strategic Overview" : activeSection}
-                                                </h2>
                                             </div>
                                         </div>
+                                    );
+                                })()}
+
+                                {/* Content Body */}
+                                <div className="flex-1 overflow-y-auto custom-scrollbar">
+                                    <div className="p-8 lg:p-12 pb-24 max-w-4xl mx-auto">
+                                        <DynamicContentRenderer content={getSectionContent(activeSection)} />
                                     </div>
-                                );
-                            })()}
-
-                            {/* 2. Universal Content Body (Dynamic) */}
-                            <div className="flex-1 overflow-y-auto custom-scrollbar">
-                                <div className="p-8 lg:p-12 pb-24 max-w-4xl mx-auto">
-                                    {/* THIS IS THE GENERIC RENDERER */}
-                                    <DynamicContentRenderer content={getSectionContent(activeSection)} />
                                 </div>
-                            </div>
+                            </motion.div>
+                        </AnimatePresence>
 
-                            {/* 3. Footer */}
-                            <div className="flex-shrink-0 border-t border-gray-100 px-8 py-5 bg-gray-50/90 backdrop-blur-md absolute bottom-0 left-0 right-0 z-10">
-                                <div className="flex items-center justify-between">
-                                    <button
-                                        onClick={handlePrev}
-                                        disabled={currentIndex === 0}
-                                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all border ${currentIndex === 0 ? "border-transparent text-gray-300 cursor-not-allowed bg-transparent" : "border-gray-200 bg-white text-gray-600 hover:border-orange-200 hover:text-orange-600 hover:shadow-sm"}`}
-                                    >
-                                        <ChevronLeft className="w-4 h-4" /> Previous
-                                    </button>
-                                    <div className="flex flex-col items-center">
-                                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                            {currentIndex + 1} / {allNavItems.length}
-                                        </span>
-                                    </div>
-                                    <button
-                                        onClick={handleNext}
-                                        disabled={currentIndex === allNavItems.length - 1}
-                                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all border ${currentIndex === allNavItems.length - 1 ? "border-transparent text-gray-300 cursor-not-allowed bg-transparent" : "border-transparent bg-gray-900 text-white hover:bg-black hover:shadow-lg shadow-gray-200"}`}
-                                    >
-                                        Next <ChevronRight className="w-4 h-4" />
-                                    </button>
+                        {/* FOOTER - Static, stays outside AnimatePresence */}
+                        <div className="flex-shrink-0 border-t border-gray-100 px-8 py-5 bg-gray-50/90 backdrop-blur-md absolute bottom-0 left-0 right-0 z-10">
+                            <div className="flex items-center justify-between">
+                                <button
+                                    onClick={handlePrev}
+                                    disabled={currentIndex === 0}
+                                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all border ${currentIndex === 0 ? "border-transparent text-gray-300 cursor-not-allowed bg-transparent" : "border-gray-200 bg-white text-gray-600 hover:border-orange-200 hover:text-orange-600 hover:shadow-sm"}`}
+                                >
+                                    <ChevronLeft className="w-4 h-4" /> Previous
+                                </button>
+                                <div className="flex flex-col items-center">
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                        {currentIndex + 1} / {allNavItems.length}
+                                    </span>
                                 </div>
+                                <button
+                                    onClick={handleNext}
+                                    disabled={currentIndex === allNavItems.length - 1}
+                                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all border ${currentIndex === allNavItems.length - 1 ? "border-transparent text-gray-300 cursor-not-allowed bg-transparent" : "border-transparent bg-gray-900 text-white hover:bg-black hover:shadow-lg shadow-gray-200"}`}
+                                >
+                                    Next <ChevronRight className="w-4 h-4" />
+                                </button>
                             </div>
+                        </div>
 
-                        </motion.div>
-                    </AnimatePresence>
+                    </div>
                 </main>
             </div>
         </div>

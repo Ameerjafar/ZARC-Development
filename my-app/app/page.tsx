@@ -11,7 +11,7 @@ export default function Home() {
     <main className="min-h-screen bg- selection:bg-blue-500/30">
       <Navbar onOpenAuth={(mode) => setAuthMode(mode)} />
       <Hero />
-      {/* <ReportModal 
+      {/* <ReportModal  
         isOpen={isReportOpen} 
         onClose={() => setIsReportOpen(false)} 
       /> */}
