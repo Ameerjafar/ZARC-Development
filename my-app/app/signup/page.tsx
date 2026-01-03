@@ -53,8 +53,7 @@ const GithubIcon = () => (
 
 export default function SignupPage() {
    const [isLoading, setIsLoading] = useState(false);
-   const [firstName, setFirstName] = useState("");
-   const [lastName, setLastName] = useState("");
+   const [fullName, setFullName] = useState("");
    const [company, setCompany] = useState("");
    const [industry, setIndustry] = useState("");
    const [email, setEmail] = useState("");
@@ -76,9 +75,8 @@ export default function SignupPage() {
                email,
                username,
                password,
-               first_name: firstName || "", // Send empty string if undefined
-               last_name: lastName || "",
-               company: company || "",
+               fullName, // Now using single fullName state
+               company,
                industry: industry || "",
             }),
          });
@@ -180,43 +178,28 @@ export default function SignupPage() {
                      </motion.div>
                   )}
 
-                  {/* Row 1: Personal Info (Optional) */}
-                  <div className="grid grid-cols-2 gap-4">
-                     <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">
-                           First Name <span className="text-slate-400 font-medium lowercase tracking-normal">(optional)</span>
-                        </label>
-                        <div className="relative group">
-                           <User className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
-                           <input
-                              type="text"
-                              placeholder="Sarah"
-                              value={firstName}
-                              onChange={(e) => setFirstName(e.target.value)}
-                              className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-slate-300"
-                           />
-                        </div>
-                     </div>
-                     <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">
-                           Last Name <span className="text-slate-400 font-medium lowercase tracking-normal">(optional)</span>
-                        </label>
-                        <div className="relative group">
-                           <input
-                              type="text"
-                              placeholder="Chen"
-                              value={lastName}
-                              onChange={(e) => setLastName(e.target.value)}
-                              className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-slate-300"
-                           />
-                        </div>
+                  {/* Full Name (REQUIRED) */}
+                  <div className="space-y-1.5">
+                     <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">
+                        Full Name <span className="text-orange-600">*</span>
+                     </label>
+                     <div className="relative group">
+                        <User className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
+                        <input
+                           type="text"
+                           placeholder="Sarah Chen"
+                           value={fullName}
+                           onChange={(e) => setFullName(e.target.value)}
+                           required
+                           className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-slate-300"
+                        />
                      </div>
                   </div>
 
-                  {/* Company Name (Optional) */}
+                  {/* Company Name (REQUIRED) */}
                   <div className="space-y-1.5">
                      <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">
-                        Company Name <span className="text-slate-400 font-medium lowercase tracking-normal">(optional)</span>
+                        Company Name <span className="text-orange-600">*</span>
                      </label>
                      <div className="relative group">
                         <Building2 className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
@@ -225,6 +208,7 @@ export default function SignupPage() {
                            placeholder="Helix Market Research"
                            value={company}
                            onChange={(e) => setCompany(e.target.value)}
+                           required
                            className="w-full bg-white border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold text-slate-900 outline-none transition-all placeholder:text-slate-400 shadow-sm hover:border-slate-300"
                         />
                      </div>

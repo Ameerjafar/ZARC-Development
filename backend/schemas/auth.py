@@ -3,14 +3,16 @@ from datetime import datetime
 from typing import Optional
 import re
 
-
 class SignUpRequest(BaseModel):
     email: EmailStr
-    username: str = Field(..., min_length=3, max_length=50)
     password: str = Field(..., min_length=8, max_length=72)
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    company: Optional[str] = None
+
+    fullName: str = Field(..., min_length=3, max_length=100)
+    
+    # Kept username because your frontend generates it and you have a validator for it
+    username: str = Field(..., min_length=3, max_length=50)
+    
+    company: str = Field(..., min_length=3, max_length=100)
     industry: Optional[str] = None
     
     @field_validator('username')
@@ -31,27 +33,23 @@ class SignUpRequest(BaseModel):
             raise ValueError('Password must contain at least one digit')
         return v
 
-
 class SignInRequest(BaseModel):
     """Request schema for user signin"""
     email: str  
     password: str
-
 
 class UserResponse(BaseModel):
     """Response schema for user data"""
     id: int
     email: str
     username: str
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    company: Optional[str] = None
+    fullName: str # Matching the request schema
+    company: str
     industry: Optional[str] = None
     created_at: datetime
     
     class Config:
         from_attributes = True
-
 
 class TokenResponse(BaseModel):
     """Response schema for authentication token"""
